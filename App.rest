@@ -1,0 +1,175 @@
+###
+
+GET http://localhost:3000/student?id="0222233022"
+
+
+### 
+GET http://localhost:3000/student/0222233022
+
+
+###
+
+GET http://localhost:3000/student?name=John Doe
+
+###
+
+GET http://localhost:3000/student/02221233022
+
+
+
+###
+
+POST http://localhost:3000/student
+Content-Type: application/json
+
+{
+    "name":"John 444",
+    "_id":"02221233022",
+    "age":20
+}
+
+###
+
+PUT http://localhost:3000/student?id=0222233022&age=25
+
+
+###
+PUT http://localhost:3000/student
+Content-Type: application/json
+
+{
+    "_id":"0222233022",
+    "age":28
+}
+
+
+###
+
+DELETE http://localhost:3000/student/02221233022
+
+
+
+
+
+
+###
+
+GET http://localhost:3000/post/23891
+
+###
+
+GET http://localhost:3000/post?id=23891
+
+
+###
+
+POST http://localhost:3000/post
+Content-Type: application/json
+
+{
+    "title":"My first post",
+    "image":"Image",
+    "owner":"Ilan",
+    "_id":"23891"
+}
+
+###
+POST http://localhost:3000/post
+Content-Type: application/json
+
+{
+    "title":"My second post",
+    "image":"Image3",
+    "owner":"Ilan",
+    "_id":"23893"
+}
+
+
+
+###
+
+PUT http://localhost:3000/post/
+Content-Type: application/json
+
+{   
+    "image":"image 22335",
+    "_id":"23893"
+}
+
+###
+PUT http://localhost:3000/post/
+Content-Type: application/json
+
+{   
+    "title":"new title 33",
+    "_id":"23893"
+}
+
+###
+PUT http://localhost:3000/post/23893
+Content-Type: application/json
+
+{
+    "image":"image 33",
+    "title":"title 33"
+    
+}
+
+###
+PUT http://localhost:3000/post/23893
+Content-Type: application/json
+
+{
+    "image":"image 23"
+}
+
+###
+PUT http://localhost:3000/post/23893
+Content-Type: application/json
+
+{
+    "title":"title 23"
+}
+
+###
+PUT http://localhost:3000/post?id=23893&title=title 233
+
+
+###
+PUT http://localhost:3000/post?id=23893&image=image 233
+
+###
+PUT http://localhost:3000/post?id=23893
+Content-Type: application/json
+
+{
+    "image":"new image 233"
+}
+
+
+###
+PUT http://localhost:3000/post?id=23893
+Content-Type: application/json
+
+{
+    "title":"new title 233"
+}
+
+###
+
+DELETE http://localhost:3000/post?id=23892
+
+
+###
+
+GET http://localhost:3000/item
+
+
+###
+POST http://localhost:3000/item
+
+###
+PUT http://localhost:3000/item
+
+###
+DELETE http://localhost:3000/item
