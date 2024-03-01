@@ -35,6 +35,15 @@ class BaseController {
                         return res.status(200).send(item);
                     }
                 }
+                if (req.query.text) {
+                    const item = yield this.itemModel.find({ text: req.query.text });
+                    if (item.length == 0) {
+                        return res.status(404).send("Not Found");
+                    }
+                    else {
+                        return res.status(200).send(item);
+                    }
+                }
                 else {
                     const item = yield this.itemModel.find();
                     console.log("Get empty collection");
@@ -110,6 +119,9 @@ class BaseController {
                         if (req.body.message) {
                             updated = yield this.itemModel.findOneAndUpdate({ _id: idItem }, { $set: { message: req.body.message } }, { returnDocument: "after" });
                         }
+                        if (req.body.text) {
+                            updated = yield this.itemModel.findOneAndUpdate({ _id: idItem }, { $set: { text: req.body.text } }, { returnDocument: "after" });
+                        }
                     }
                 }
                 if (updated) {
@@ -138,12 +150,9 @@ class BaseController {
                 console.log(error);
                 res.status(404).send(error.message);
             }
-            //res.send("student delete by id");
         });
     }
 }
 ;
-//export default { getStudents,getStudentById, postStudents,putStudentById,deleteStudentById };
-// export default baseController;
 exports.default = BaseController;
 //# sourceMappingURL=base_controller.js.map
