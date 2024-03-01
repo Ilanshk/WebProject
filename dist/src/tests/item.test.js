@@ -107,7 +107,7 @@ describe("Item", () => {
     }));
     test(" FAIL to DELETE item by its ID", () => __awaiter(void 0, void 0, void 0, function* () {
         const res = yield (0, supertest_1.default)(app).delete("/item/E432");
-        expect(res.statusCode).toBe(400);
+        expect(res.statusCode).toBe(404);
     }));
 });
 //# sourceMappingURL=item.test.js.map

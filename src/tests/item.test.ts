@@ -126,7 +126,7 @@ describe("Item",()=>{
 
     test(" FAIL to DELETE item by its ID",async() =>{
         const res =await request(app).delete("/item/E432");
-        expect(res.statusCode).toBe(400);
+        expect(res.statusCode).toBe(404);
     })
 
 })

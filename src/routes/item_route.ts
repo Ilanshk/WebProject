@@ -3,14 +3,14 @@ const router = express.Router();
 import ItemController from "../controllers/item_controller";
 
 
-router.get("/",ItemController.getAllItems);
-router.get("/:id",ItemController.getItemById);
+router.get("/",ItemController.get.bind(ItemController));
+router.get("/:id",ItemController.getById.bind(ItemController));
 
-router.post("/",ItemController.createItem);
+router.post("/",ItemController.post.bind(ItemController));
 
-router.put("/:id",ItemController.updateItem);
+router.put("/:id",ItemController.put.bind(ItemController));
 
-router.delete("/:id",ItemController.deleteItem);
+router.delete("/:id",ItemController.remove.bind(ItemController));
 
 export default router;
 
