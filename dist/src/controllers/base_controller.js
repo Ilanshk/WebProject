@@ -18,6 +18,7 @@ class BaseController {
             console.log("get");
             try {
                 if (req.query.name != null) {
+                    console.log("name");
                     const item = yield this.itemModel.find({ name: req.query.name });
                     if (item.length == 0) {
                         return res.status(404).send("Student Not Found");
@@ -27,6 +28,7 @@ class BaseController {
                     }
                 }
                 if (req.query.title != null) {
+                    console.log("title");
                     const item = yield this.itemModel.find({ title: req.query.title });
                     if (item.length == 0) {
                         return res.status(404).send("Not Found");
@@ -35,7 +37,8 @@ class BaseController {
                         return res.status(200).send(item);
                     }
                 }
-                if (req.query.text) {
+                if (req.query.text != null) {
+                    console.log("text");
                     const item = yield this.itemModel.find({ text: req.query.text });
                     if (item.length == 0) {
                         return res.status(404).send("Not Found");
@@ -45,14 +48,16 @@ class BaseController {
                     }
                 }
                 else {
+                    console.log("no filter");
                     const item = yield this.itemModel.find();
+                    console.log(item);
                     console.log("Get empty collection");
                     return res.status(200).send(item);
                 }
             }
             catch (error) {
                 console.log(error);
-                res.status(400).send(error.message);
+                return res.status(400).send(error.message);
             }
         });
     }

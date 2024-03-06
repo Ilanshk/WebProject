@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import studentRoute from "./routes/student_route";
 import postRoute from "./routes/post_route";
 import itemRoute from "./routes/item_route";
+import authRoute from "./routes/auth_route";
 
 const initApp = () =>{
     const promise = new Promise<Express>((resolve)=>{
@@ -19,6 +20,7 @@ const initApp = () =>{
             app.use("/student",studentRoute);
             app.use("/post",postRoute);
             app.use("/item",itemRoute);
+            app.use("/auth",authRoute);
             resolve(app);
         });
     });
