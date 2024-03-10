@@ -65,7 +65,21 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const accessToken = jsonwebtoken_1.default.sign({
             _id: user.id //this is returned in the verify(if successful) in auth_middleware.ts
         }, process.env.TOKEN_SECRET, { expiresIn: process.env.TOKEN_EXPIRATION });
-        return res.status(200).send({ accessToken: accessToken });
+        const refreshToken = jsonwebtoken_1.default.sign({
+            _id: user.id //this is returned in the verify(if successful) in auth_middleware.ts
+        }, process.env.REFRESH_TOKEN_SECRET);
+        if (user.tokens == null) {
+            user.tokens = [refreshToken];
+        }
+        else {
+            user.tokens.push(refreshToken);
+        }
+        //save user document in db(update it)
+        yield user.save();
+        return res.status(200).send({
+            accessToken: accessToken,
+            refreshToken: refreshToken
+        });
     }
     catch (error) {
         console.log(error);
@@ -75,5 +89,50 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 const logout = (req, res) => {
     res.status(400).send("logout");
 };
-exports.default = { register, login, logout };
+const refresh = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    //First extract token from HTTP header request
+    const authHeader = req.headers['authorization']; // authorization Header =  bearer(TOKEN TYPE)+ " " + token
+    const refreshToken = authHeader && authHeader.split(' ')[1];
+    if (refreshToken == null) {
+        return res.status(401).send("Missing Token");
+    }
+    //verify token
+    jsonwebtoken_1.default.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, userInfo) => __awaiter(void 0, void 0, void 0, function* () {
+        if (err) {
+            return res.status(403).send("Invalid Token");
+        }
+        try {
+            const user = yield user_model_1.default.findById(userInfo._id);
+            if (user == null || user.tokens == null || !user.tokens.includes(refreshToken)) {
+                if (user.tokens != null) {
+                    user.tokens = []; //delete all refresh tokens of user, now no one can create new access token for that user
+                    yield user.save();
+                }
+                return res.status(403).send("Invalid Token");
+            }
+            //generate new access token
+            const accessToken = jsonwebtoken_1.default.sign({
+                _id: user.id //this is returned in the verify(if successful) in auth_middleware.ts
+            }, process.env.TOKEN_SECRET, { expiresIn: process.env.TOKEN_EXPIRATION });
+            //generate new refresh token
+            const newRefreshToken = jsonwebtoken_1.default.sign({
+                _id: user.id //this is returned in the verify(if successful) in auth_middleware.ts
+            }, process.env.REFRESH_TOKEN_SECRET);
+            //delete old refresh token and update refresh token in db
+            user.tokens = user.tokens.filter(token => token != refreshToken);
+            user.tokens.push(newRefreshToken);
+            yield user.save();
+            //return new access token & new refresh token
+            return res.status(200).send({
+                accessToken: accessToken,
+                refreshToken: newRefreshToken
+            });
+        }
+        catch (error) {
+            console.log(error);
+            res.status(400).send(error.message);
+        }
+    }));
+});
+exports.default = { register, login, logout, refresh };
 //# sourceMappingURL=auth_controller.js.map

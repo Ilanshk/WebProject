@@ -9,5 +9,9 @@ const auth_controller_1 = __importDefault(require("../controllers/auth_controlle
 router.post("/login", auth_controller_1.default.login);
 router.post("/register", auth_controller_1.default.register);
 router.post("/logout", auth_controller_1.default.logout);
+//Route to get a new access token
+//We do not send anything in the HTTP body request
+//The refresh token is in the header of the HTTP request
+router.get("/refresh", auth_controller_1.default.refresh);
 exports.default = router;
 //# sourceMappingURL=auth_route.js.map

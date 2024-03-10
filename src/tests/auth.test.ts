@@ -35,9 +35,10 @@ describe("Auth test", () =>{
         expect(res.statusCode).toBe(200);
 
         const accessToken = res.body.accessToken;
-        console.log(accessToken);
-        
+        const refreshToken = res.body.refreshToken;
         expect(accessToken).not.toBeNull();
+        expect(refreshToken).not.toBeNull();
+
         //Here we add the authorization field to the request
         const res2 = await request(app).get("/student/").set('Authorization','Bearer ' + accessToken);
         expect(res2.statusCode).toBe(200);
@@ -47,6 +48,10 @@ describe("Auth test", () =>{
         expect(res3.statusCode).not.toBe(200);
 
     });
+
+    test("refresh token", async()=>{
+        
+    })
 
    
 });
