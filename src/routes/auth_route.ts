@@ -5,7 +5,7 @@ router.post("/login",authController.login);
 router.post("/register",authController.register);
 router.post("/logout",authController.logout);
 
-//Route to get a new access token
+//Route to get a new refresh token
 //We do not send anything in the HTTP body request
 //The refresh token is in the header of the HTTP request
 router.get("/refresh",authController.refresh);

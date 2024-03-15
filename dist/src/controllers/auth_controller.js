@@ -118,7 +118,7 @@ const refresh = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             const newRefreshToken = jsonwebtoken_1.default.sign({
                 _id: user.id //this is returned in the verify(if successful) in auth_middleware.ts
             }, process.env.REFRESH_TOKEN_SECRET);
-            //delete old refresh token and update refresh token in db
+            //delete old refresh token and update new refresh token in db
             user.tokens = user.tokens.filter(token => token != refreshToken);
             user.tokens.push(newRefreshToken);
             yield user.save();
