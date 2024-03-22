@@ -9,6 +9,7 @@
     "test": "tsc && jest --detectOpenHandles --forceExit  ",
     "testStudent": "tsc && jest --detectOpenHandles --forceExit ./src/tests/student.test.ts",
     "testAuth": "tsc && jest --detectOpenHandles --forceExit ./src/tests/auth.test.ts",
+    "testPost": "tsc && jest --detectOpenHandles --forceExit ./src/tests/post.test.ts",
     "lint": "eslint . --ext .ts"
   },
   "author": "Ilan Shklover",

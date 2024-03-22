@@ -35,6 +35,26 @@ const register = async (req:Request,res:Response) =>{
     }
 }
 
+//Generate token for user
+//TOKEN_SECRET is for the encryption of the token
+//In this case it is not RSA algorithm
+const generateTokens = (userId:string):{accessToken:string, refreshToken:string} =>{
+    const accessToken = jwt.sign({
+        _id:userId //this is returned in the verify(if successful) in auth_middleware.ts
+    },process.env.TOKEN_SECRET,
+    {expiresIn: process.env.TOKEN_EXPIRATION});
+
+    const refreshToken = jwt.sign({
+        _id:userId, //this is returned in the verify(if successful) in auth_middleware.ts
+        salt:Math.random()
+    },process.env.REFRESH_TOKEN_SECRET);
+
+    return {
+        accessToken : accessToken,
+        refreshToken:refreshToken
+    }
+}
+
 const login = async (req:Request,res:Response) =>{
     console.log("login");
     const email = req.body.email; 
@@ -56,17 +76,7 @@ const login = async (req:Request,res:Response) =>{
             return res.status(400).send("Invalid Email or Password ")
         }
 
-        //Generate token for user
-        //TOKEN_SECRET is for the encryption of the token
-        //In this case it is not RSA algorithm
-        const accessToken = jwt.sign({
-            _id:user.id //this is returned in the verify(if successful) in auth_middleware.ts
-        },process.env.TOKEN_SECRET,
-        {expiresIn: process.env.TOKEN_EXPIRATION});
-
-        const refreshToken = jwt.sign({
-            _id:user.id //this is returned in the verify(if successful) in auth_middleware.ts
-        },process.env.REFRESH_TOKEN_SECRET);
+        const {accessToken,refreshToken} = generateTokens(user._id.toString());
 
         if(user.tokens == null){
             user.tokens = [refreshToken]
@@ -96,20 +106,20 @@ const logout = (req:Request,res:Response) =>{
 const refresh = async(req:Request,res:Response) =>{
     //First extract token from HTTP header request
     const authHeader = req.headers['authorization']; // authorization Header =  bearer(TOKEN TYPE)+ " " + token
-    const refreshToken = authHeader && authHeader.split(' ')[1];    
-    if(refreshToken == null){
+    const refreshTokenOriginal = authHeader && authHeader.split(' ')[1];    
+    if(refreshTokenOriginal == null){
         return res.status(401).send("Missing Token");
     }
 
     //verify token
-    jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET,async(err,userInfo:{_id:string})=>{
+    jwt.verify(refreshTokenOriginal,process.env.REFRESH_TOKEN_SECRET,async(err,userInfo:{_id:string})=>{
         if(err){
             return res.status(403).send("Invalid Token");
         }
 
         try{
             const user = await User.findById(userInfo._id);
-            if(user == null || user.tokens == null || !user.tokens.includes(refreshToken)){
+            if(user == null || user.tokens == null || !user.tokens.includes(refreshTokenOriginal)){
                 if(user.tokens != null){
                     user.tokens = []; //delete all refresh tokens of user, now no one can create new access token for that user
                     await user.save();
@@ -117,25 +127,17 @@ const refresh = async(req:Request,res:Response) =>{
                 return res.status(403).send("Invalid Token");
             }
     
-            //generate new access token
-            const accessToken = jwt.sign({
-                _id:user.id //this is returned in the verify(if successful) in auth_middleware.ts
-            },process.env.TOKEN_SECRET,
-            {expiresIn: process.env.TOKEN_EXPIRATION});
-    
-            //generate new refresh token
-            const newRefreshToken = jwt.sign({
-                _id:user.id //this is returned in the verify(if successful) in auth_middleware.ts
-            },process.env.REFRESH_TOKEN_SECRET);
+            //generate new access token and refresh token
+            const {accessToken,refreshToken} = generateTokens(user._id.toString());
     
             //delete old refresh token and update new refresh token in db
-            user.tokens = user.tokens.filter(token => token!=refreshToken)
-            user.tokens.push(newRefreshToken);
+            user.tokens = user.tokens.filter(token => token!=refreshTokenOriginal)
+            user.tokens.push(refreshToken);
             await user.save();
             //return new access token & new refresh token
             return res.status(200).send({
                 accessToken:accessToken,
-                refreshToken:newRefreshToken
+                refreshToken:refreshToken
             });
         }catch(error){
             console.log(error);

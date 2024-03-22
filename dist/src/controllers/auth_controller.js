@@ -42,6 +42,22 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.status(400).send(error.message);
     }
 });
+//Generate token for user
+//TOKEN_SECRET is for the encryption of the token
+//In this case it is not RSA algorithm
+const generateTokens = (userId) => {
+    const accessToken = jsonwebtoken_1.default.sign({
+        _id: userId //this is returned in the verify(if successful) in auth_middleware.ts
+    }, process.env.TOKEN_SECRET, { expiresIn: process.env.TOKEN_EXPIRATION });
+    const refreshToken = jsonwebtoken_1.default.sign({
+        _id: userId, //this is returned in the verify(if successful) in auth_middleware.ts
+        salt: Math.random()
+    }, process.env.REFRESH_TOKEN_SECRET);
+    return {
+        accessToken: accessToken,
+        refreshToken: refreshToken
+    };
+};
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("login");
     const email = req.body.email;
@@ -59,15 +75,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (!isValidPassword) {
             return res.status(400).send("Invalid Email or Password ");
         }
-        //Generate token for user
-        //TOKEN_SECRET is for the encryption of the token
-        //In this case it is not RSA algorithm
-        const accessToken = jsonwebtoken_1.default.sign({
-            _id: user.id //this is returned in the verify(if successful) in auth_middleware.ts
-        }, process.env.TOKEN_SECRET, { expiresIn: process.env.TOKEN_EXPIRATION });
-        const refreshToken = jsonwebtoken_1.default.sign({
-            _id: user.id //this is returned in the verify(if successful) in auth_middleware.ts
-        }, process.env.REFRESH_TOKEN_SECRET);
+        const { accessToken, refreshToken } = generateTokens(user._id.toString());
         if (user.tokens == null) {
             user.tokens = [refreshToken];
         }
@@ -92,40 +100,34 @@ const logout = (req, res) => {
 const refresh = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //First extract token from HTTP header request
     const authHeader = req.headers['authorization']; // authorization Header =  bearer(TOKEN TYPE)+ " " + token
-    const refreshToken = authHeader && authHeader.split(' ')[1];
-    if (refreshToken == null) {
+    const refreshTokenOriginal = authHeader && authHeader.split(' ')[1];
+    if (refreshTokenOriginal == null) {
         return res.status(401).send("Missing Token");
     }
     //verify token
-    jsonwebtoken_1.default.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, userInfo) => __awaiter(void 0, void 0, void 0, function* () {
+    jsonwebtoken_1.default.verify(refreshTokenOriginal, process.env.REFRESH_TOKEN_SECRET, (err, userInfo) => __awaiter(void 0, void 0, void 0, function* () {
         if (err) {
             return res.status(403).send("Invalid Token");
         }
         try {
             const user = yield user_model_1.default.findById(userInfo._id);
-            if (user == null || user.tokens == null || !user.tokens.includes(refreshToken)) {
+            if (user == null || user.tokens == null || !user.tokens.includes(refreshTokenOriginal)) {
                 if (user.tokens != null) {
                     user.tokens = []; //delete all refresh tokens of user, now no one can create new access token for that user
                     yield user.save();
                 }
                 return res.status(403).send("Invalid Token");
             }
-            //generate new access token
-            const accessToken = jsonwebtoken_1.default.sign({
-                _id: user.id //this is returned in the verify(if successful) in auth_middleware.ts
-            }, process.env.TOKEN_SECRET, { expiresIn: process.env.TOKEN_EXPIRATION });
-            //generate new refresh token
-            const newRefreshToken = jsonwebtoken_1.default.sign({
-                _id: user.id //this is returned in the verify(if successful) in auth_middleware.ts
-            }, process.env.REFRESH_TOKEN_SECRET);
+            //generate new access token and refresh token
+            const { accessToken, refreshToken } = generateTokens(user._id.toString());
             //delete old refresh token and update new refresh token in db
-            user.tokens = user.tokens.filter(token => token != refreshToken);
-            user.tokens.push(newRefreshToken);
+            user.tokens = user.tokens.filter(token => token != refreshTokenOriginal);
+            user.tokens.push(refreshToken);
             yield user.save();
             //return new access token & new refresh token
             return res.status(200).send({
                 accessToken: accessToken,
-                refreshToken: newRefreshToken
+                refreshToken: refreshToken
             });
         }
         catch (error) {
