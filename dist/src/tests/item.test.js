@@ -16,12 +16,22 @@ const supertest_1 = __importDefault(require("supertest"));
 const App_1 = __importDefault(require("../App"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const item_model_1 = __importDefault(require("../models/item_model"));
+const user_model_1 = __importDefault(require("../models/user_model"));
 let app;
+let testingUser = {
+    email: "testItem@gmail.com",
+    password: "some1password",
+    accessToken: null
+};
 //is called before tests are performed in this file
 beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
     app = yield (0, App_1.default)();
     console.log("beforeAll");
     yield item_model_1.default.deleteMany();
+    yield user_model_1.default.deleteOne({ email: testingUser.email });
+    yield (0, supertest_1.default)(app).post("/auth/register").send(testingUser);
+    const res = yield (0, supertest_1.default)(app).post("/auth/login").send(testingUser);
+    testingUser.accessToken = res.body.accessToken;
 }));
 afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
     console.log("afterAll");
@@ -38,75 +48,113 @@ const items = [
 describe("Item", () => {
     let itemId1, itemId2;
     test("Get /Item - empty collection", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).get("/item");
+        const res = yield (0, supertest_1.default)(app)
+            .get("/item")
+            .set('Authorization', 'Bearer ' + testingUser.accessToken);
         expect(res.statusCode).toBe(200);
         const data = res.body;
         expect(data).toEqual([]);
     }));
     test("POST /item 1 and GET this item", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).post("/item").send(items[0]);
+        const res = yield (0, supertest_1.default)(app)
+            .post("/item")
+            .set('Authorization', 'Bearer ' + testingUser.accessToken)
+            .send(items[0]);
         expect(res.statusCode).toEqual(201);
         expect(res.body.text).toEqual(items[0].text);
         itemId1 = res.body._id;
-        const res2 = yield (0, supertest_1.default)(app).get("/item");
+        const res2 = yield (0, supertest_1.default)(app)
+            .get("/item")
+            .set('Authorization', 'Bearer ' + testingUser.accessToken);
         expect(res2.statusCode).toBe(200);
         const data = res2.body;
         expect(data[0].text).toBe(items[0].text);
     }));
     test("POST /item 2 and GET this item by id", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).post("/item").send(items[1]);
+        const res = yield (0, supertest_1.default)(app)
+            .post("/item")
+            .set('Authorization', 'Bearer ' + testingUser.accessToken)
+            .send(items[1]);
         expect(res.statusCode).toEqual(201);
         expect(res.body.text).toEqual(items[1].text);
         itemId2 = res.body._id;
-        const res2 = yield (0, supertest_1.default)(app).get("/item/" + itemId2);
+        const res2 = yield (0, supertest_1.default)(app)
+            .get("/item/" + itemId2)
+            .set('Authorization', 'Bearer ' + testingUser.accessToken);
         expect(res2.statusCode).toBe(200);
         const data = res2.body;
         expect(data.text).toBe(items[1].text);
     }));
     test("GET /item/:id", () => __awaiter(void 0, void 0, void 0, function* () {
-        const resFirstItem = yield (0, supertest_1.default)(app).get("/item/" + itemId1);
+        const resFirstItem = yield (0, supertest_1.default)(app)
+            .get("/item/" + itemId1)
+            .set('Authorization', 'Bearer ' + testingUser.accessToken);
         expect(resFirstItem.statusCode).toBe(200);
         expect(resFirstItem.body.text).toBe(items[0].text);
-        const resSecondItem = yield (0, supertest_1.default)(app).get("/item/" + itemId2);
+        const resSecondItem = yield (0, supertest_1.default)(app)
+            .get("/item/" + itemId2)
+            .set('Authorization', 'Bearer ' + testingUser.accessToken);
         expect(resSecondItem.statusCode).toBe(200);
         expect(resSecondItem.body.text).toBe(items[1].text);
     }));
     test("Fail GET /item/:id", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).get("/item/00000");
+        const res = yield (0, supertest_1.default)(app)
+            .get("/item/00000")
+            .set('Authorization', 'Bearer ' + testingUser.accessToken);
         expect(res.statusCode).toBe(404);
     }));
     test("GET all items ", () => __awaiter(void 0, void 0, void 0, function* () {
-        const allItemsRes = yield (0, supertest_1.default)(app).get("/item");
+        const allItemsRes = yield (0, supertest_1.default)(app)
+            .get("/item")
+            .set('Authorization', 'Bearer ' + testingUser.accessToken);
         expect(allItemsRes.statusCode).toBe(200);
         expect(allItemsRes.body[0].text).toBe(items[0].text);
         expect(allItemsRes.body[1].text).toBe(items[1].text);
     }));
     test("GET item by text", () => __awaiter(void 0, void 0, void 0, function* () {
-        const resItem = yield (0, supertest_1.default)(app).get("/item").query({ text: items[0].text });
+        const resItem = yield (0, supertest_1.default)(app)
+            .get("/item")
+            .query({ text: items[0].text })
+            .set('Authorization', 'Bearer ' + testingUser.accessToken);
         expect(resItem.statusCode).toBe(200);
         expect(resItem.body[0].text).toBe(items[0].text);
     }));
     test("FAIL to get item by text", () => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield (0, supertest_1.default)(app).get("/item").query({ text: "wwerrt" });
+        const response = yield (0, supertest_1.default)(app)
+            .get("/item")
+            .query({ text: "wwerrt" })
+            .set('Authorization', 'Bearer ' + testingUser.accessToken);
         expect(response.statusCode).toBe(404);
     }));
     test("PUT /item/:id", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).put("/item/" + itemId1).send({ text: "New Text For Item 1" });
+        const res = yield (0, supertest_1.default)(app)
+            .put("/item/" + itemId1)
+            .set('Authorization', 'Bearer ' + testingUser.accessToken)
+            .send({ text: "New Text For Item 1" });
         expect(res.statusCode).toBe(200);
         expect(res.body.text).toBe("New Text For Item 1");
     }));
     test("FAIL to PUT item document", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).put("/item/" + itemId2).send({ text: [11, 22] });
+        const res = yield (0, supertest_1.default)(app)
+            .put("/item/" + itemId2)
+            .set('Authorization', 'Bearer ' + testingUser.accessToken)
+            .send({ text: [11, 22] });
         expect(res.statusCode).toBe(400);
     }));
     test("DELETE item by its ID", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).delete("/item/" + itemId1);
+        const res = yield (0, supertest_1.default)(app)
+            .delete("/item/" + itemId1)
+            .set('Authorization', 'Bearer ' + testingUser.accessToken);
         expect(res.statusCode).toBe(200);
-        const resp = yield (0, supertest_1.default)(app).get("/item/" + itemId1);
+        const resp = yield (0, supertest_1.default)(app)
+            .get("/item/" + itemId1)
+            .set('Authorization', 'Bearer ' + testingUser.accessToken);
         expect(resp.statusCode).toBe(404);
     }));
     test(" FAIL to DELETE item by its ID", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).delete("/item/E432");
+        const res = yield (0, supertest_1.default)(app)
+            .delete("/item/E432")
+            .set('Authorization', 'Bearer ' + testingUser.accessToken);
         expect(res.statusCode).toBe(404);
     }));
 });
