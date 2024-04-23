@@ -2,6 +2,7 @@ import express from "express";
 const router = express.Router();
 import PostController from "../controllers/post_controller";
 import authMiddleware from "../common/auth_middleware";
+import mongoose from "mongoose";
 
 /**
 * @swagger
@@ -20,6 +21,15 @@ import authMiddleware from "../common/auth_middleware";
 *       bearerFormat: JWT   
 */
 
+/**
+* @swagger
+* components:
+*   schemas:
+*     ObjectId:
+*       type: string
+*       description: A string representing MongoDB's ObjectId 
+*/
+
 
 /**
 * @swagger
@@ -34,7 +44,8 @@ import authMiddleware from "../common/auth_middleware";
 *         - owner
 *       properties:
 *         _id:
-*           type: mongoose.Types.ObjectId
+*           type: string
+*           format: ObjectId
 *           description: The post's unique identifier
 *         title:
 *           type: string
@@ -43,7 +54,8 @@ import authMiddleware from "../common/auth_middleware";
 *           type: string
 *           description: The post's content
 *         owner:
-*           type: mongoose.Types.ObjectId
+*           type: string
+*           format: ObjectId
 *           description: The user's identifier who wrote the post
 *       example:
 *         _id: 'a7b9d3l1aipc8301gco'
@@ -66,8 +78,8 @@ import authMiddleware from "../common/auth_middleware";
 *         name: 'id'
 *         required: true
 *         schema:
-*           type: 'string'
-*           example: '12345'
+*           type: string
+*           format: ObjectId
 *         description: Unique ID of the post to retrieve
 *     responses:
 *       200:
@@ -166,11 +178,11 @@ router.post("/",authMiddleware, PostController.post.bind(PostController));
 *       - bearerAuth: []
 *     parameters:
 *       - in: 'path'
-*         name: postId
+*         name: 'id'
 *         required: true
 *         schema:
 *           type: string
-*           example: '12345'
+*           format: ObjectId
 *         description: Post ID to update
 *     requestBody:
 *        required: true
@@ -219,11 +231,11 @@ router.put("/:id",authMiddleware,PostController.put.bind(PostController));
 *       - bearerAuth : []
 *     parameters:
 *       - in: 'path'
-*         name: postID
+*         name: 'id'
 *         required: true
 *         schema:
 *           type: string
-*           example: '12345'
+*           format: ObjectId
 *         description: ID of the Post to delete
 *     responses:
 *       200:

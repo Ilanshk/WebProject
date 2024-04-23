@@ -137,7 +137,83 @@ router.get("/:id", auth_middleware_1.default, student_controller_1.default.getBy
 *
 */
 router.post("/", auth_middleware_1.default, student_controller_1.default.post.bind(student_controller_1.default));
+/**
+* @swagger
+* /student/{id}:
+*   put:
+*     summary: Update student's age
+*     tags: [Student]
+*     security:
+*       - bearerAuth: []
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             type: object
+*             required:
+*               - age
+*             properties:
+*               age:
+*                 type: Number
+*                 description: The student's age
+*             example:
+*               age: 20
+*     parameters:
+*       - in: 'path'
+*         name: 'id'
+*         required: true
+*         schema:
+*           type: 'string'
+*           example: '12345'
+*         description: Unique ID of the student to change its age
+*     responses:
+*       200:
+*         description: Student age was updated successfully
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/components/schemas/Student'
+*       400:
+*         description: Error in updating Student's age
+*       401:
+*         description: Missing Token
+*       403:
+*         description: Invalid Token
+*       404:
+*         description: Student to update was not found
+*
+*/
 router.put("/:id", auth_middleware_1.default, student_controller_1.default.put.bind(student_controller_1.default));
+/**
+* @swagger
+* /student/{id}:
+*   delete:
+*     summary: Delete student with provided ID
+*     tags: [Student]
+*     security:
+*       - bearerAuth: []
+*     parameters:
+*       - in: 'path'
+*         name: 'id'
+*         required: true
+*         schema:
+*           type: 'string'
+*           example: '12345'
+*         description: Unique ID of the student to delete
+*     responses:
+*       200:
+*         description: Student was deleted successfully
+*       400:
+*         description: Error in Deleting Student
+*       401:
+*         description: Missing Token
+*       403:
+*         description: Invalid Token
+*       404:
+*         description: Student to delete was not found
+*
+*/
 router.delete("/:id", auth_middleware_1.default, student_controller_1.default.remove.bind(student_controller_1.default));
 exports.default = router;
 //# sourceMappingURL=student_route.js.map

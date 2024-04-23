@@ -90,7 +90,7 @@ class BaseController<ModelType>{
 
 
   async put(req:Request, res:Response){
-    console.log("student put by Id");
+    console.log("Update by Id");
     let idItem,updated;
     try{
       if(req.query) {
@@ -105,13 +105,11 @@ class BaseController<ModelType>{
       if(req.params){
         idItem = req.params.id;
         if(req.body){
-          //data = req.body;
-          //idItem = data._id;
           if(req.body.age){
             updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{age:req.body.age}},{"returnDocument":"after"});
           }
           if(req.body.title){
-            updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{title:req.body.title}},{returnDocument:"after"});
+            updated = await this.itemModel.findOneAndUpdate({_id: idItem},{$set:{title:req.body.title}},{returnDocument:"after"});
           }
           if(req.body.message){
             updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{message:req.body.message}},{returnDocument:"after"});

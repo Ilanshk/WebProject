@@ -31,7 +31,7 @@ import authMiddleware from "../common/auth_middleware";
 *         - text
 *       properties:
 *         _id:
-*           type: mongoose.Types.ObjectId
+*           type: ObjectId
 *           description: The Item's unique identifier
 *         text:
 *           type: string
@@ -79,7 +79,7 @@ router.get("/",authMiddleware,ItemController.get.bind(ItemController));
 *       - bearerAuth: []
 *     parameters:
 *       - in: 'path'
-*         name: 'ItemID'
+*         name: 'id'
 *         required: true
 *         schema:
 *           type: string
@@ -149,7 +149,7 @@ router.post("/",authMiddleware,ItemController.post.bind(ItemController));
 *       - bearerAuth: []
 *     parameters:
 *       - in: 'path'
-*         name: ItemID
+*         name: 'id'
 *         required: true
 *         schema:
 *           type: string
@@ -198,7 +198,7 @@ router.put("/:id",authMiddleware,ItemController.put.bind(ItemController));
 *       - bearerAuth : []
 *     parameters:
 *       - in: 'path'
-*         name: ItemID
+*         name: 'id'
 *         required: true
 *         schema:
 *           type: string

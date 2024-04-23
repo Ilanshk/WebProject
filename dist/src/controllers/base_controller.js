@@ -98,7 +98,7 @@ class BaseController {
     ;
     put(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("student put by Id");
+            console.log("Update by Id");
             let idItem, updated;
             try {
                 if (req.query) {
@@ -112,6 +112,7 @@ class BaseController {
                 }
                 if (req.params) {
                     idItem = req.params.id;
+                    console.log(idItem);
                     if (req.body) {
                         //data = req.body;
                         //idItem = data._id;

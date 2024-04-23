@@ -16,7 +16,8 @@ const authMiddleware = async(req:Request,res:Response,next: NextFunction) =>{
         if(err){
             return res.status(403).send("Invalid Token");
         }
-        req.body.user = user //Keep user's data for using it in the express pipeline 
+        req.body.user = user //Keep user's data for using it in the express pipeline
+        
         next();
     }); 
         
