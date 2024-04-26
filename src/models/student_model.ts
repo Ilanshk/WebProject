@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 export interface IStudent{
     name:String,
     _id:String,
-    age:Number
+    imageUrl:Number
 
 }
 const studentSchema = new mongoose.Schema<IStudent>({
@@ -16,8 +16,8 @@ const studentSchema = new mongoose.Schema<IStudent>({
         type:String,
         required:true,
     },
-    age:{
-        type:Number,
+    imageUrl:{
+        type:String,
         required:true,
     },
 });

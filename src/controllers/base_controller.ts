@@ -43,10 +43,8 @@ class BaseController<ModelType>{
         }
       }
       else{
-        console.log("no filter");
         const item = await this.itemModel.find();
-        console.log(item);
-        console.log("Get empty collection");
+        //console.log(item);
         return res.status(200).send(item);
       }
       
@@ -76,7 +74,7 @@ class BaseController<ModelType>{
   
   async post(req:Request, res:Response){
     console.log("req.params = " + req.params[0])
-    console.log("req.body = " + req.body[0])
+    console.log("req.body = " + req.body)
 
     console.log("student post");
     try{

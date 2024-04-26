@@ -8,8 +8,11 @@ import studentRoute from "./routes/student_route";
 import postRoute from "./routes/post_route";
 import itemRoute from "./routes/item_route";
 import authRoute from "./routes/auth_route";
+import imageRouter from "./routes/image_route";
+import multer from "multer";
 
 const initApp = () =>{
+    
     const promise = new Promise<Express>((resolve)=>{
         const db = mongoose.connection;
         db.on('error',(err)=>console.error(err));
@@ -21,6 +24,7 @@ const initApp = () =>{
             app.use("/post",postRoute);
             app.use("/item",itemRoute);
             app.use("/auth",authRoute);
+            app.use("/file",imageRouter);
             resolve(app);
         });
     });

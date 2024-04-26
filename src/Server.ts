@@ -2,6 +2,7 @@ import appInit from "./App";
 import swaggerUI from "swagger-ui-express";
 import swaggerJsDoc from "swagger-jsdoc";
 
+
 appInit().then((app)=>{
     if(process.env.NODE_ENV == "development"){
         const options = {
