@@ -25,6 +25,7 @@ const initApp = () =>{
             app.use("/item",itemRoute);
             app.use("/auth",authRoute);
             app.use("/file",imageRouter);
+            app.use("/uploads",express.static("uploads"))
             resolve(app);
         });
     });
