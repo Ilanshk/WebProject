@@ -99,6 +99,10 @@ class BaseController<ModelType>{
         if(req.query.message){
           updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{message:req.query.message}},{"returnDocument":"after"});
         }
+        if(req.query.imageUrl){
+          updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{imageUrl:req.query.imageUrl}},{"returnDocument":"after"});
+
+        }
       }
       if(req.params){
         idItem = req.params.id;
@@ -114,6 +118,9 @@ class BaseController<ModelType>{
           }
           if(req.body.text){
             updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{text:req.body.text}},{returnDocument:"after"});
+          }
+          if(req.body.imageUrl){
+            updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{imageUrl:req.body.imageUrl}},{returnDocument:"after"});
           }
         }
       }

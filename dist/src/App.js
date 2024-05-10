@@ -13,6 +13,7 @@ const student_route_1 = __importDefault(require("./routes/student_route"));
 const post_route_1 = __importDefault(require("./routes/post_route"));
 const item_route_1 = __importDefault(require("./routes/item_route"));
 const auth_route_1 = __importDefault(require("./routes/auth_route"));
+const image_route_1 = __importDefault(require("./routes/image_route"));
 const initApp = () => {
     const promise = new Promise((resolve) => {
         const db = mongoose_1.default.connection;
@@ -25,6 +26,8 @@ const initApp = () => {
             app.use("/post", post_route_1.default);
             app.use("/item", item_route_1.default);
             app.use("/auth", auth_route_1.default);
+            app.use("/file", image_route_1.default);
+            app.use("/uploads", express_1.default.static("uploads"));
             resolve(app);
         });
     });

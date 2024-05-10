@@ -13,9 +13,9 @@ const studentSchema = new mongoose_1.default.Schema({
         type: String,
         required: true,
     },
-    age: {
-        type: Number,
-        required: true,
+    imageUrl: {
+        type: String,
+        required: false,
     },
 });
 exports.default = mongoose_1.default.model("Student", studentSchema);

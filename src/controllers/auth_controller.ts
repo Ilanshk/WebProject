@@ -2,6 +2,11 @@ import {NextFunction, Request,Response} from "express"
 import User from "../models/user_model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import {OAuth2Client} from 'google-auth-library';
+
+const client = new OAuth2Client();
+
+
 const register = async (req:Request,res:Response) =>{
     console.log(req.body);
 
@@ -16,18 +21,24 @@ const register = async (req:Request,res:Response) =>{
     try{
         const user = await User.findOne({email:email})
         if(user){
-            return res.status(400).send("User already exists")
+            return res.status(409).send("User already exists")
         }
         //user does not exist, encrypt his password and create new instance
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password,salt);
-
+       
         const newUser = await User.create({
             email:email,
             password:hashedPassword
         });
+        const userTokens = generateTokens(newUser._id.toString())
 
-        return res.status(200).send(newUser);
+        return res.status(200).send({
+            email:email,
+            password:hashedPassword,
+            //userImageUrl:user.userImageUrl,
+            userTokens: userTokens
+        });
     }catch(error){
         console.log(error);
         return res.status(400).send(error.message);
@@ -99,6 +110,45 @@ const login = async (req:Request,res:Response) =>{
     
 }
 
+const signInWithGoogle = async(req:Request,res:Response) =>{
+    try{
+        const Loginticket = await client.verifyIdToken({
+        idToken: req.body.token,
+        audience: process.env.CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
+    });
+    const payload = Loginticket.getPayload();
+    const email = payload?.email;
+    if(email != null){
+        let user = await User.findOne({email:email})
+        if(user == null){
+            //user not found, create new user
+            user = await User.create(
+                {
+                    email:email,
+                    password:'',
+                    imageUrl:payload?.picture,
+                    //what about tokens?
+                }
+            )
+        }
+        const tokens = generateTokens(user._id.toString());
+        console.log("tokens were generated");
+        
+        return res.status(200).send(
+            {
+                email:user.email,
+                userImageUrl:user.userImageUrl,
+                userTokens: tokens
+            });
+    }
+    }catch(error){
+        return res.status(400).send(error.message)
+
+
+    }
+}
+
+
 const logout = (req:Request,res:Response) =>{
     res.status(400).send("logout");
 }
@@ -147,4 +197,4 @@ const refresh = async(req:Request,res:Response) =>{
     }); 
     
 }
-export default {register,login,logout,refresh}
+export default {register,login,logout,refresh,signInWithGoogle}

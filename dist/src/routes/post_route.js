@@ -26,6 +26,14 @@ const auth_middleware_1 = __importDefault(require("../common/auth_middleware"));
 * @swagger
 * components:
 *   schemas:
+*     ObjectId:
+*       type: string
+*       description: A string representing MongoDB's ObjectId
+*/
+/**
+* @swagger
+* components:
+*   schemas:
 *     Post:
 *       type: object
 *       required:
@@ -35,7 +43,8 @@ const auth_middleware_1 = __importDefault(require("../common/auth_middleware"));
 *         - owner
 *       properties:
 *         _id:
-*           type: mongoose.Types.ObjectId
+*           type: string
+*           format: ObjectId
 *           description: The post's unique identifier
 *         title:
 *           type: string
@@ -44,7 +53,8 @@ const auth_middleware_1 = __importDefault(require("../common/auth_middleware"));
 *           type: string
 *           description: The post's content
 *         owner:
-*           type: mongoose.Types.ObjectId
+*           type: string
+*           format: ObjectId
 *           description: The user's identifier who wrote the post
 *       example:
 *         _id: 'a7b9d3l1aipc8301gco'
@@ -65,8 +75,8 @@ const auth_middleware_1 = __importDefault(require("../common/auth_middleware"));
 *         name: 'id'
 *         required: true
 *         schema:
-*           type: 'string'
-*           example: '12345'
+*           type: string
+*           format: ObjectId
 *         description: Unique ID of the post to retrieve
 *     responses:
 *       200:
@@ -159,11 +169,11 @@ router.post("/", auth_middleware_1.default, post_controller_1.default.post.bind(
 *       - bearerAuth: []
 *     parameters:
 *       - in: 'path'
-*         name: postId
+*         name: 'id'
 *         required: true
 *         schema:
-*           type: ObjectId
-*           example: a12n34k5
+*           type: string
+*           format: ObjectId
 *         description: Post ID to update
 *     requestBody:
 *        required: true
@@ -209,11 +219,11 @@ router.put("/:id", auth_middleware_1.default, post_controller_1.default.put.bind
 *       - bearerAuth : []
 *     parameters:
 *       - in: 'path'
-*         name: postID
+*         name: 'id'
 *         required: true
 *         schema:
 *           type: string
-*           example: '12345'
+*           format: ObjectId
 *         description: ID of the Post to delete
 *     responses:
 *       200:

@@ -18,7 +18,7 @@ const studentSchema = new mongoose.Schema<IStudent>({
     },
     imageUrl:{
         type:String,
-        required:true,
+        required:false,
     },
 });
 export default mongoose.model<IStudent>("Student",studentSchema);

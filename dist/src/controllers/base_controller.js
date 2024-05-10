@@ -48,10 +48,8 @@ class BaseController {
                     }
                 }
                 else {
-                    console.log("no filter");
                     const item = yield this.itemModel.find();
-                    console.log(item);
-                    console.log("Get empty collection");
+                    //console.log(item);
                     return res.status(200).send(item);
                 }
             }
@@ -83,7 +81,7 @@ class BaseController {
     post(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log("req.params = " + req.params[0]);
-            console.log("req.body = " + req.body[0]);
+            console.log("req.body = " + req.body);
             console.log("student post");
             try {
                 const item = yield this.itemModel.create(req.body);
@@ -109,13 +107,13 @@ class BaseController {
                     if (req.query.message) {
                         updated = yield this.itemModel.findOneAndUpdate({ _id: idItem }, { $set: { message: req.query.message } }, { "returnDocument": "after" });
                     }
+                    if (req.query.imageUrl) {
+                        updated = yield this.itemModel.findOneAndUpdate({ _id: idItem }, { $set: { imageUrl: req.query.imageUrl } }, { "returnDocument": "after" });
+                    }
                 }
                 if (req.params) {
                     idItem = req.params.id;
-                    console.log(idItem);
                     if (req.body) {
-                        //data = req.body;
-                        //idItem = data._id;
                         if (req.body.age) {
                             updated = yield this.itemModel.findOneAndUpdate({ _id: idItem }, { $set: { age: req.body.age } }, { "returnDocument": "after" });
                         }
@@ -127,6 +125,9 @@ class BaseController {
                         }
                         if (req.body.text) {
                             updated = yield this.itemModel.findOneAndUpdate({ _id: idItem }, { $set: { text: req.body.text } }, { returnDocument: "after" });
+                        }
+                        if (req.body.imageUrl) {
+                            updated = yield this.itemModel.findOneAndUpdate({ _id: idItem }, { $set: { imageUrl: req.body.imageUrl } }, { returnDocument: "after" });
                         }
                     }
                 }

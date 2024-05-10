@@ -57,7 +57,7 @@ const auth_middleware_1 = __importDefault(require("../common/auth_middleware"));
 * @swagger
 * /student:
 *   get:
-*     summary: Get all Students existing or all students according to a specific requirement
+*     summary: Get all Students existing
 *     tags: [Student]
 *     security:
 *       - bearerAuth: []

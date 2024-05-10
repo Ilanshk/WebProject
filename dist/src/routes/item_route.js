@@ -33,7 +33,7 @@ const auth_middleware_1 = __importDefault(require("../common/auth_middleware"));
 *         - text
 *       properties:
 *         _id:
-*           type: mongoose.Types.ObjectId
+*           type: ObjectId
 *           description: The Item's unique identifier
 *         text:
 *           type: string
@@ -77,7 +77,7 @@ router.get("/", auth_middleware_1.default, item_controller_1.default.get.bind(it
 *       - bearerAuth: []
 *     parameters:
 *       - in: 'path'
-*         name: 'ItemID'
+*         name: 'id'
 *         required: true
 *         schema:
 *           type: string
@@ -143,7 +143,7 @@ router.post("/", auth_middleware_1.default, item_controller_1.default.post.bind(
 *       - bearerAuth: []
 *     parameters:
 *       - in: 'path'
-*         name: ItemID
+*         name: 'id'
 *         required: true
 *         schema:
 *           type: string
@@ -190,7 +190,7 @@ router.put("/:id", auth_middleware_1.default, item_controller_1.default.put.bind
 *       - bearerAuth : []
 *     parameters:
 *       - in: 'path'
-*         name: ItemID
+*         name: 'id'
 *         required: true
 *         schema:
 *           type: string

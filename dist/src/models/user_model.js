@@ -11,7 +11,11 @@ const userSchema = new mongoose_1.default.Schema({
     },
     password: {
         type: String,
-        required: true
+        required: false
+    },
+    userImageUrl: {
+        type: String,
+        required: false
     },
     //If we let the user to enter the app from multiple places like personal computer,phone,tablet,etc.
     //then we keep a refresh token for each instance of the app

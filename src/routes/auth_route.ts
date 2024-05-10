@@ -102,7 +102,7 @@ router.post("/login",authController.login);
 *               $ref: '#/components/schemas/User'
 */
 router.post("/register",authController.register);
-
+router.post("/google",authController.signInWithGoogle)
 
 /**
 * @swagger

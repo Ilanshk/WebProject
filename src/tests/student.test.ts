@@ -35,12 +35,12 @@ const students = [
     {
         name:"John Doe",
         _id:"12345",
-        age:22,
+        imageUrl:"",
     },
     {
         name:"Jane Doe 2",
         _id:"12346",
-        age:23,
+        imageUrl:"",
     },
 
 ];
@@ -60,7 +60,7 @@ describe("Student",()=>{
         .set('Authorization','Bearer '+testUser.accessToken)
         expect(res.statusCode).toEqual(201);
         expect(res.body.name).toEqual(students[0].name);
-        expect(res.body.age).toEqual(students[0].age);
+        expect(res.body.imageUrl).toEqual(students[0].imageUrl);
         expect(res.body._id).toEqual(students[0]._id);
         //studentId = res.body._id; //save the ID for later tests
         const res2 = await request(app).get("/student")
@@ -69,7 +69,7 @@ describe("Student",()=>{
         const data = res2.body;
         expect(data[0].name).toBe(students[0].name);
         expect(data[0]._id).toBe(students[0]._id);
-        expect(data[0].age).toBe(students[0].age);
+        expect(data[0].imageUrl).toBe(students[0].imageUrl);
         
     })
 
@@ -79,7 +79,7 @@ describe("Student",()=>{
         .set('Authorization','Bearer '+testUser.accessToken)
         expect(res.statusCode).toEqual(201);
         expect(res.body.name).toEqual(students[1].name);
-        expect(res.body.age).toEqual(students[1].age);
+        expect(res.body.imageUrl).toEqual(students[1].imageUrl);
         expect(res.body._id).toEqual(students[1]._id);
 
         //studentId = res.body._id; //save the ID for later tests
@@ -89,7 +89,7 @@ describe("Student",()=>{
         const data = res2.body;
         expect(data.name).toBe(students[1].name);
         expect(data._id).toBe(students[1]._id);
-        expect(data.age).toBe(students[1].age);
+        expect(data.imageUrl).toBe(students[1].imageUrl);
         
     })
 
@@ -100,14 +100,14 @@ describe("Student",()=>{
         expect(resFirstStudent.statusCode).toBe(200);
         expect(resFirstStudent.body.name).toBe(students[0].name);
         expect(resFirstStudent.body._id).toBe(students[0]._id);
-        expect(resFirstStudent.body.age).toBe(students[0].age);
+        expect(resFirstStudent.body.imageUrl).toBe(students[0].imageUrl);
 
         const resSecondStudent = await request(app).get("/student/" + students[1]._id)
         .set('Authorization','Bearer '+testUser.accessToken);
         expect(resSecondStudent.statusCode).toBe(200);
         expect(resSecondStudent.body.name).toBe(students[1].name);
         expect(resSecondStudent.body._id).toBe(students[1]._id);
-        expect(resSecondStudent.body.age).toBe(students[1].age);
+        expect(resSecondStudent.body.imageUrl).toBe(students[1].imageUrl);
     });
 
     test("Fail GET /student/:id",async() =>{
@@ -122,10 +122,10 @@ describe("Student",()=>{
         .set('Authorization','Bearer '+testUser.accessToken);
         expect(allStudentsRes.statusCode).toBe(200);
         expect(allStudentsRes.body[0].name).toBe(students[0].name);
-        expect(allStudentsRes.body[0].age).toBe(students[0].age);
+        expect(allStudentsRes.body[0].imageUrl).toBe(students[0].imageUrl);
         expect(allStudentsRes.body[0]._id).toBe(students[0]._id);
         expect(allStudentsRes.body[1].name).toBe(students[1].name);
-        expect(allStudentsRes.body[1].age).toBe(students[1].age);
+        expect(allStudentsRes.body[1].imageUrl).toBe(students[1].imageUrl);
         expect(allStudentsRes.body[1]._id).toBe(students[1]._id);
     })
 
@@ -134,7 +134,7 @@ describe("Student",()=>{
         .set('Authorization','Bearer '+testUser.accessToken);
         expect(resStudent.statusCode).toBe(200);
         expect(resStudent.body[0].name).toBe(students[1].name);
-        expect(resStudent.body[0].age).toBe(students[1].age);
+        expect(resStudent.body[0].imageUrl).toBe(students[1].imageUrl);
         expect(resStudent.body[0]._id).toBe(students[1]._id);
     })
 
@@ -145,17 +145,18 @@ describe("Student",()=>{
     })
 
     test("PUT /student/:id",async()=>{
-        const res = await request(app).put("/student/"+students[1]._id).send({age:25})
+        const res = await request(app).put("/student/"+students[1]._id).send({imageUrl:"url"})
         .set('Authorization','Bearer '+testUser.accessToken);
+        console.log("Tets PUT /student/:id"+ res.body)
         expect(res.statusCode).toBe(200);
         expect(res.body._id).toBe(students[1]._id);
         expect(res.body.name).toBe(students[1].name);
-        expect(res.body.age).toBe(25);
+        expect(res.body.imageUrl).toBe("url");
         
     })
 
     test("FAIL to PUT student document",async() =>{
-        const res = await request(app).put("/student/"+students[1]._id).send({age:"AAAA"})
+        const res = await request(app).put("/student/"+students[1]._id).send({imageUrl:{id:80}})
         .set('Authorization','Bearer '+testUser.accessToken);
         expect(res.statusCode).toBe(400);
     })
