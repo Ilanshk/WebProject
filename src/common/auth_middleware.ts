@@ -6,7 +6,8 @@ const authMiddleware = async(req:Request,res:Response,next: NextFunction) =>{
     //if the token is valid, it means the user logged-in-->call next()
     //from the token we can retrieve the user id as we declared in jwt.sign()
     const authHeader = req.headers['authorization']; // authorization Header =  bearer(TOKEN TYPE)+ " " + token
-    const token = authHeader && authHeader.split(' ')[1];    
+    const token = authHeader && authHeader.split(' ')[1]; 
+       
     if(token == null){
         return res.status(401).send("Missing Token");
     }

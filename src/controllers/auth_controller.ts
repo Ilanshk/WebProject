@@ -12,6 +12,7 @@ const register = async (req:Request,res:Response) =>{
 
     const email = req.body.email; 
     const password = req.body.password;
+    const imageUrl = req.body.userImageUrl;
 
     if(email == null || password == null){
         return res.status(400).send("Missing Email or Password")
@@ -29,14 +30,15 @@ const register = async (req:Request,res:Response) =>{
        
         const newUser = await User.create({
             email:email,
-            password:hashedPassword
+            password:hashedPassword,
+            userImageUrl:imageUrl
         });
         const userTokens = generateTokens(newUser._id.toString())
 
         return res.status(200).send({
             email:email,
             password:hashedPassword,
-            //userImageUrl:user.userImageUrl,
+            userImageUrl:imageUrl,
             userTokens: userTokens
         });
     }catch(error){
