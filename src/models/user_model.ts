@@ -1,13 +1,25 @@
 import mongoose from "mongoose";
 
 export interface IUser{
+    firstName:string;
+    lastName:string;
     email:string;
     password:string;
     userImageUrl:string;
     tokens:string[];
+    userAge:String,
+    userCountry:String
 }
 
 const userSchema = new mongoose.Schema<IUser>({
+    firstName:{
+        type:String,
+        required:true
+    },
+    lastName:{
+        type:String,
+        required:true
+    },
     email:{ //it a unique name of the user, not necessary its email
         type:String,
         required:true
@@ -25,6 +37,14 @@ const userSchema = new mongoose.Schema<IUser>({
     //If we let the user to enter the app from a single place,then we keep a single refresh token
     tokens:{
         type:[String]
+    },
+    userAge:{
+        type:String,
+        required:false,
+    },
+    userCountry:{
+        type:String,
+        required:false,
     }
 });
 

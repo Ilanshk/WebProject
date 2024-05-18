@@ -10,9 +10,13 @@ const client = new OAuth2Client();
 const register = async (req:Request,res:Response) =>{
     console.log(req.body);
 
+    const firstName=req.body.firstName;
+    const lastName = req.body.lastName;
     const email = req.body.email; 
     const password = req.body.password;
     const imageUrl = req.body.userImageUrl;
+    const age = req.body.userAge;
+    const state = req.body.userState;
 
     if(email == null || password == null){
         return res.status(400).send("Missing Email or Password")
@@ -29,20 +33,29 @@ const register = async (req:Request,res:Response) =>{
         const hashedPassword = await bcrypt.hash(password,salt);
        
         const newUser = await User.create({
+            firstName:firstName,
+            lastName:lastName,
             email:email,
             password:hashedPassword,
-            userImageUrl:imageUrl
+            userImageUrl:imageUrl,
+            userAge:age,
+            userCountry:state
         });
         const userTokens = generateTokens(newUser._id.toString())
 
         return res.status(200).send({
+            firstName:firstName,
+            lastName:lastName,
             email:email,
             password:hashedPassword,
             userImageUrl:imageUrl,
+            userAge:age,
+            userCountry:state,
             userTokens: userTokens
         });
     }catch(error){
         console.log(error);
+        console.log("Error register")
         return res.status(400).send(error.message);
         
     }
