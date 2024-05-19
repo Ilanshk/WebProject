@@ -5,6 +5,7 @@ dotenv.config();
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import studentRoute from "./routes/student_route";
+import userRoute from "./routes/user_route";
 import postRoute from "./routes/post_route";
 import itemRoute from "./routes/item_route";
 import authRoute from "./routes/auth_route";
@@ -21,6 +22,7 @@ const initApp = () =>{
             app.use(bodyParser.json())
             app.use(bodyParser.urlencoded({extended:true}));
             app.use("/student",studentRoute);
+            app.use("/user",userRoute);
             app.use("/post",postRoute);
             app.use("/item",itemRoute);
             app.use("/auth",authRoute);

@@ -103,6 +103,7 @@ const login = async (req:Request,res:Response) =>{
         }
 
         const {accessToken,refreshToken} = generateTokens(user._id.toString());
+        const userFullName = user.firstName + " " + user.lastName;
 
         if(user.tokens == null){
             user.tokens = [refreshToken]
@@ -114,6 +115,7 @@ const login = async (req:Request,res:Response) =>{
         await user.save();
 
         return res.status(200).send({
+            userName: userFullName,
             accessToken:accessToken,
             refreshToken:refreshToken
         });
