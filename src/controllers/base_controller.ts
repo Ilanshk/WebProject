@@ -89,10 +89,11 @@ class BaseController<ModelType>{
 
   async put(req:Request, res:Response){
     console.log("Update by Id");
+    
     let idItem,updated;
     try{
       if(req.query) {
-        idItem= req.query.id;
+        idItem= req.params.id; 
         if(req.query.title){
           updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{title:req.query.title}},{"returnDocument":"after"});
         }
@@ -101,8 +102,8 @@ class BaseController<ModelType>{
         }
         if(req.query.imageUrl){
           updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{imageUrl:req.query.imageUrl}},{"returnDocument":"after"});
-
         }
+        
       }
       if(req.params){
         idItem = req.params.id;
@@ -121,6 +122,12 @@ class BaseController<ModelType>{
           }
           if(req.body.imageUrl){
             updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{imageUrl:req.body.imageUrl}},{returnDocument:"after"});
+          }
+          if(req.body.userAge){
+            updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{userAge:req.body.userAge}},{"returnDocument":"after"});
+          }
+          if(req.body.userCountry){
+            updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{userCountry:req.body.userCountry}},{"returnDocument":"after"});
           }
         }
       }

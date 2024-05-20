@@ -107,4 +107,39 @@ import authMiddleware from "../common/auth_middleware";
 */  
 router.get("/:id",authMiddleware,userController.getById.bind(userController));
 
+
+
+/**
+* @swagger
+* /user/{id}:
+*   put:
+*     summary: update user details according to a given ID of a user
+*     tags: [User]
+*     security:
+*       - bearerAuth: []
+*     parameters:
+*       - in: 'path'
+*         name: 'id'
+*         required: true
+*         schema:
+*           type: string
+*           format: ObjectId
+*         description: Unique ID of the User to update
+*     responses:
+*       200:
+*         description: User accepted successfully
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/components/schemas/User'
+*       400:
+*         description: Error in getting User
+*       401:
+*         description: Missing Token
+*       403:
+*         description: Invalid Token
+*       404:
+*         description: User was not found   
+*/
+router.put("/:id",authMiddleware,userController.put.bind(userController))
 export default router;

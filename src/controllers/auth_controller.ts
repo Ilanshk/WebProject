@@ -115,6 +115,7 @@ const login = async (req:Request,res:Response) =>{
         await user.save();
 
         return res.status(200).send({
+            userId: user._id,
             userName: userFullName,
             accessToken:accessToken,
             refreshToken:refreshToken
