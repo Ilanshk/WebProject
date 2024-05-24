@@ -42,9 +42,17 @@ class BaseController<ModelType>{
           return res.status(200).send(item);
         }
       }
+      if(req.body.owner!= null){
+        const item = await this.itemModel.find({owner:req.body.owner});
+        if(item.length == 0){
+          return res.status(404).send("Not Found");
+        }
+        else{
+          return res.status(200).send(item);
+        }
+      }
       else{
         const item = await this.itemModel.find();
-        //console.log(item);
         return res.status(200).send(item);
       }
       
@@ -73,10 +81,7 @@ class BaseController<ModelType>{
   }
   
   async post(req:Request, res:Response){
-    console.log("req.params = " + req.params[0])
-    console.log("req.body = " + req.body)
-
-    console.log("student post");
+    console.log("post");
     try{
       const item = await this.itemModel.create(req.body);
       res.status(201).send(item);
@@ -107,6 +112,7 @@ class BaseController<ModelType>{
       }
       if(req.params){
         idItem = req.params.id;
+        
         if(req.body){
           if(req.body.age){
             updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{age:req.body.age}},{"returnDocument":"after"});
@@ -128,6 +134,10 @@ class BaseController<ModelType>{
           }
           if(req.body.userCountry){
             updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{userCountry:req.body.userCountry}},{"returnDocument":"after"});
+          }
+          if(req.body.postContent){
+            console.log("Updating post content");
+            updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{postText:req.body.postContent}},{"returnDocument":"after"});
           }
         }
       }
