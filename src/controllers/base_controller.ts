@@ -135,6 +135,9 @@ class BaseController<ModelType>{
           if(req.body.userCountry){
             updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{userCountry:req.body.userCountry}},{"returnDocument":"after"});
           }
+          if(req.body.userImageUrl){
+            updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{userImageUrl:req.body.userImageUrl}},{"returnDocument":"after"});
+          }
           if(req.body.postContent){
             console.log("Updating post content");
             updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{postText:req.body.postContent}},{"returnDocument":"after"});
