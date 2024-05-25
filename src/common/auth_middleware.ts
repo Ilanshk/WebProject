@@ -15,7 +15,7 @@ const authMiddleware = async(req:Request,res:Response,next: NextFunction) =>{
     }
 
     //token received, now verify it
-    jwt.verify(token,process.env.TOKEN_SECRET,(err,user)=>{
+    jwt.verify(token,process.env.REFRESH_TOKEN_SECRET,(err,user)=>{
         if(err){
             return res.status(403).send("Invalid Token");
         }

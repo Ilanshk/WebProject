@@ -104,7 +104,9 @@ const login = async (req:Request,res:Response) =>{
 
         const {accessToken,refreshToken} = generateTokens(user._id.toString());
         const userFullName = user.firstName + " " + user.lastName;
-       
+        console.log("access token: "+accessToken);
+        console.log("refresh token: "+refreshToken);
+        
         
         if(user.tokens == null){
             user.tokens = [refreshToken]

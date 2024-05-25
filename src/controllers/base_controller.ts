@@ -139,6 +139,10 @@ class BaseController<ModelType>{
             console.log("Updating post content");
             updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{postText:req.body.postContent}},{"returnDocument":"after"});
           }
+          if(req.body.postImageUrl){
+            console.log("Updating post image");
+            updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{postImageUrl:req.body.postImageUrl}},{"returnDocument":"after"});
+          }
         }
       }
       if(updated){
