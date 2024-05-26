@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const multer_1 = __importDefault(require("multer"));
 const router = express_1.default.Router();
-const auth_middleware_1 = __importDefault(require("../common/auth_middleware"));
 const baseUrl = "http://192.168.56.1:3000/";
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
@@ -18,7 +17,7 @@ const storage = multer_1.default.diskStorage({
     }
 });
 const upload = (0, multer_1.default)({ storage });
-router.post('/file', auth_middleware_1.default, upload.single('file'), function (req, res) {
+router.post('/file', upload.single('file'), function (req, res) {
     res.status(200).send({ url: baseUrl + req.file.destination + req.file.filename });
 });
 exports.default = router;

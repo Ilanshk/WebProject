@@ -42,6 +42,18 @@ class BaseController<ModelType>{
           return res.status(200).send(item);
         }
       }
+      if(req.query.owner != null){
+        console.log("owner");
+        console.log(req.query);
+        
+        const item = await this.itemModel.find({owner:req.query.owner});
+        if(item.length == 0){
+          return res.status(404).send("Not Found");
+        }
+        else{
+          return res.status(200).send(item);
+        }
+      }
       if(req.body.owner!= null){
         const item = await this.itemModel.find({owner:req.body.owner});
         if(item.length == 0){
@@ -82,6 +94,8 @@ class BaseController<ModelType>{
   
   async post(req:Request, res:Response){
     console.log("post");
+    console.log(req.body);
+    
     try{
       const item = await this.itemModel.create(req.body);
       res.status(201).send(item);
@@ -108,6 +122,7 @@ class BaseController<ModelType>{
         if(req.query.imageUrl){
           updated = await this.itemModel.findOneAndUpdate({_id:idItem},{$set:{imageUrl:req.query.imageUrl}},{"returnDocument":"after"});
         }
+        
         
       }
       if(req.params){

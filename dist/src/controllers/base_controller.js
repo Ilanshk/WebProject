@@ -47,9 +47,28 @@ class BaseController {
                         return res.status(200).send(item);
                     }
                 }
+                if (req.query.owner != null) {
+                    console.log("owner");
+                    console.log(req.query);
+                    const item = yield this.itemModel.find({ owner: req.query.owner });
+                    if (item.length == 0) {
+                        return res.status(404).send("Not Found");
+                    }
+                    else {
+                        return res.status(200).send(item);
+                    }
+                }
+                if (req.body.owner != null) {
+                    const item = yield this.itemModel.find({ owner: req.body.owner });
+                    if (item.length == 0) {
+                        return res.status(404).send("Not Found");
+                    }
+                    else {
+                        return res.status(200).send(item);
+                    }
+                }
                 else {
                     const item = yield this.itemModel.find();
-                    //console.log(item);
                     return res.status(200).send(item);
                 }
             }
@@ -80,9 +99,8 @@ class BaseController {
     }
     post(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("req.params = " + req.params[0]);
-            console.log("req.body = " + req.body);
-            console.log("student post");
+            console.log("post");
+            console.log(req.body);
             try {
                 const item = yield this.itemModel.create(req.body);
                 res.status(201).send(item);
@@ -100,7 +118,7 @@ class BaseController {
             let idItem, updated;
             try {
                 if (req.query) {
-                    idItem = req.query.id;
+                    idItem = req.params.id;
                     if (req.query.title) {
                         updated = yield this.itemModel.findOneAndUpdate({ _id: idItem }, { $set: { title: req.query.title } }, { "returnDocument": "after" });
                     }
@@ -128,6 +146,23 @@ class BaseController {
                         }
                         if (req.body.imageUrl) {
                             updated = yield this.itemModel.findOneAndUpdate({ _id: idItem }, { $set: { imageUrl: req.body.imageUrl } }, { returnDocument: "after" });
+                        }
+                        if (req.body.userAge) {
+                            updated = yield this.itemModel.findOneAndUpdate({ _id: idItem }, { $set: { userAge: req.body.userAge } }, { "returnDocument": "after" });
+                        }
+                        if (req.body.userCountry) {
+                            updated = yield this.itemModel.findOneAndUpdate({ _id: idItem }, { $set: { userCountry: req.body.userCountry } }, { "returnDocument": "after" });
+                        }
+                        if (req.body.userImageUrl) {
+                            updated = yield this.itemModel.findOneAndUpdate({ _id: idItem }, { $set: { userImageUrl: req.body.userImageUrl } }, { "returnDocument": "after" });
+                        }
+                        if (req.body.postContent) {
+                            console.log("Updating post content");
+                            updated = yield this.itemModel.findOneAndUpdate({ _id: idItem }, { $set: { postText: req.body.postContent } }, { "returnDocument": "after" });
+                        }
+                        if (req.body.postImageUrl) {
+                            console.log("Updating post image");
+                            updated = yield this.itemModel.findOneAndUpdate({ _id: idItem }, { $set: { postImageUrl: req.body.postImageUrl } }, { "returnDocument": "after" });
                         }
                     }
                 }

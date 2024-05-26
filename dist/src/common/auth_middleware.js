@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("auth middleware");
+    console.log("Token: " + req.headers['authorization']);
     //extract token from http header and check if it is valid
     //if the token is valid, it means the user logged-in-->call next()
     //from the token we can retrieve the user id as we declared in jwt.sign()
@@ -24,7 +25,7 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         return res.status(401).send("Missing Token");
     }
     //token received, now verify it
-    jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET, (err, user) => {
+    jsonwebtoken_1.default.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
         if (err) {
             return res.status(403).send("Invalid Token");
         }

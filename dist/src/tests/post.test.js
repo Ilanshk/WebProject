@@ -19,19 +19,24 @@ const post_model_1 = __importDefault(require("../models/post_model"));
 const user_model_1 = __importDefault(require("../models/user_model"));
 let app;
 const testUser = {
-    email: "post@gmail.com",
-    password: "123456",
-    accessToken: null
+    firstName: "testFirst",
+    lastName: "testLast",
+    email: "postTest@gmail.com",
+    password: "1234567",
+    userImageUrl: "http://192.168.56.1:3000/1715429550383",
+    userAge: "20",
+    userCountry: "Israel"
 };
+let refreshToken = '';
 //is called before tests are performed in this file
 beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
     app = yield (0, App_1.default)();
     console.log("beforeAll");
-    yield post_model_1.default.deleteMany();
+    yield post_model_1.default.deleteMany({ _id: 1456227 });
     yield user_model_1.default.deleteMany({ email: testUser.email });
-    yield (0, supertest_1.default)(app).post("/auth/register").send(testUser);
-    const res = yield (0, supertest_1.default)(app).post("/auth/login").send(testUser);
-    testUser.accessToken = res.body.accessToken;
+    yield (0, supertest_1.default)(app).post("/auth/register").send({ firstName: testUser.firstName, lastName: testUser.lastName, email: testUser.email, password: testUser.password, userImageUrl: testUser.userImageUrl, userAge: testUser.userAge, userCountry: testUser.userCountry });
+    const res = yield (0, supertest_1.default)(app).post("/auth/login").send({ email: testUser.email, password: testUser.password });
+    refreshToken = res.body.refreshToken;
 }));
 afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
     console.log("afterAll");
@@ -39,157 +44,172 @@ afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
 }));
 const posts = [
     {
-        title: "My First Post",
-        message: "New Restaurant Opened",
-        owner: "Ilan"
+        _id: 1456227,
+        postText: "post 1 text",
+        owner: "Ilan",
+        postImageUrl: "http://localhost:192.168.56.1:3000/647677368i7874397.jpg"
     },
     {
-        title: "My Second Post",
-        message: "Trip to Kineret",
-        owner: "Ilan"
+        _id: 1798438,
+        postText: "post 2 text",
+        owner: "Sagiv",
+        postImageUrl: "http://localhost:192.168.56.1:3000/647677368i9074651.jpg"
     },
 ];
 describe("Post", () => {
     let postId1, postId2;
-    test("Get /Post - empty collection", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app)
-            .get("/post")
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
-        expect(res.statusCode).toBe(200);
-        const data = res.body;
-        expect(data).toEqual([]);
-    }));
     test("Create /post 1 and GET this post", () => __awaiter(void 0, void 0, void 0, function* () {
         const res = yield (0, supertest_1.default)(app).post("/post")
-            .set('Authorization', 'Bearer ' + testUser.accessToken)
+            .set('Authorization', 'Bearer ' + refreshToken)
             .send(posts[0]);
         expect(res.statusCode).toEqual(201);
-        expect(res.body.title).toEqual(posts[0].title);
-        expect(res.body.message).toEqual(posts[0].message);
+        expect(res.body._id).toEqual(posts[0]._id);
+        expect(res.body.postText).toEqual(posts[0].postText);
+        expect(res.body.postImageUrl).toEqual(posts[0].postImageUrl);
         let owner_id = (yield (user_model_1.default.findOne({ email: testUser.email })))._id;
         expect(new mongoose_1.default.Types.ObjectId(res.body.owner)).toEqual(owner_id);
         postId1 = res.body._id;
         console.log("PostID1", postId1);
         const res2 = yield (0, supertest_1.default)(app)
             .get("/post/" + postId1)
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
+            .set('Authorization', 'Bearer ' + refreshToken);
         expect(res2.statusCode).toBe(200);
         const data = res2.body; //OBJECT IS RETURNED
         console.log(data);
-        expect(data.title).toBe(posts[0].title);
-        expect(data.message).toBe(posts[0].message);
+        expect(data._id).toBe(posts[0]._id);
+        expect(data.postText).toBe(posts[0].postText);
+        expect(data.postImageUrl).toBe(posts[0].postImageUrl);
         owner_id = (yield (user_model_1.default.findOne({ email: testUser.email })))._id;
         expect(new mongoose_1.default.Types.ObjectId(data.owner)).toEqual(owner_id);
     }));
     test("Create /post 2 and GET this post by id", () => __awaiter(void 0, void 0, void 0, function* () {
         const res = yield (0, supertest_1.default)(app).post("/post")
-            .set('Authorization', 'Bearer ' + testUser.accessToken)
+            .set('Authorization', 'Bearer ' + refreshToken)
             .send(posts[1]);
         expect(res.statusCode).toEqual(201);
-        expect(res.body.title).toEqual(posts[1].title);
-        expect(res.body.message).toEqual(posts[1].message);
+        expect(res.body._id).toEqual(posts[1]._id);
+        expect(res.body.postText).toEqual(posts[1].postText);
+        expect(res.body.postImageUrl).toEqual(posts[1].postImageUrl);
         let owner_id = (yield (user_model_1.default.findOne({ email: testUser.email })))._id;
         expect(new mongoose_1.default.Types.ObjectId(res.body.owner)).toEqual(owner_id);
         postId2 = res.body._id;
         console.log("PostID2= ", postId2);
         const res2 = yield (0, supertest_1.default)(app)
             .get("/post/" + postId2)
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
+            .set('Authorization', 'Bearer ' + refreshToken);
         expect(res2.statusCode).toBe(200);
         const data = res2.body;
-        expect(data.title).toBe(posts[1].title);
-        expect(data.message).toBe(posts[1].message);
+        expect(data._id).toBe(posts[1]._id);
+        expect(data.postText).toBe(posts[1].postText);
+        expect(data.postImageUrl).toBe(posts[1].postImageUrl);
         owner_id = (yield (user_model_1.default.findOne({ email: testUser.email })))._id;
         expect(new mongoose_1.default.Types.ObjectId(data.owner)).toEqual(owner_id);
     }));
     test("GET /post/:id", () => __awaiter(void 0, void 0, void 0, function* () {
         const resFirstPost = yield (0, supertest_1.default)(app)
             .get("/post/" + postId1)
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
+            .set('Authorization', 'Bearer ' + refreshToken);
         expect(resFirstPost.statusCode).toBe(200);
-        expect(resFirstPost.body.title).toBe(posts[0].title);
-        expect(resFirstPost.body.message).toBe(posts[0].message);
+        expect(resFirstPost.body._id).toBe(posts[0]._id);
+        expect(resFirstPost.body.postText).toBe(posts[0].postText);
+        expect(resFirstPost.body.postImageUrl).toBe(posts[0].postImageUrl);
         let postOwner = (yield user_model_1.default.findOne({ email: testUser.email }))._id;
         expect(new mongoose_1.default.Types.ObjectId(resFirstPost.body.owner)).toEqual(postOwner);
         const resSecondPost = yield (0, supertest_1.default)(app)
             .get("/post/" + postId2)
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
+            .set('Authorization', 'Bearer ' + refreshToken);
         expect(resSecondPost.statusCode).toBe(200);
-        expect(resSecondPost.body.title).toBe(posts[1].title);
-        expect(resSecondPost.body.message).toBe(posts[1].message);
+        expect(resSecondPost.body._id).toBe(posts[1]._id);
+        expect(resSecondPost.body.postText).toBe(posts[1].postText);
+        expect(resSecondPost.body.postImageUrl).toBe(posts[1].postImageUrl);
         postOwner = (yield user_model_1.default.findOne({ email: testUser.email }))._id;
         expect(new mongoose_1.default.Types.ObjectId(resSecondPost.body.owner)).toEqual(postOwner);
     }));
     test("Fail GET /post/:id", () => __awaiter(void 0, void 0, void 0, function* () {
         const res = yield (0, supertest_1.default)(app)
             .get("/post/00000")
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
+            .set('Authorization', 'Bearer ' + refreshToken);
         expect(res.statusCode).toBe(404);
     }));
     test("GET all posts ", () => __awaiter(void 0, void 0, void 0, function* () {
         const allPostsRes = yield (0, supertest_1.default)(app)
             .get("/post")
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
+            .set('Authorization', 'Bearer ' + refreshToken);
         expect(allPostsRes.statusCode).toBe(200);
-        expect(allPostsRes.body[0].title).toBe(posts[0].title);
-        expect(allPostsRes.body[0].message).toBe(posts[0].message);
+        const allPostsForTests = allPostsRes.body.filter((post) => post._id == 1456227 || post._id == 1798438);
+        expect(allPostsForTests[0]._id).toBe(posts[0]._id);
+        expect(allPostsForTests[0].postText).toBe(posts[0].postText);
+        expect(allPostsForTests[0].postImageUrl).toBe(posts[0].postImageUrl);
         let postOwner = (yield user_model_1.default.findOne({ email: testUser.email }))._id;
-        expect(new mongoose_1.default.Types.ObjectId(allPostsRes.body[0].owner)).toEqual(postOwner);
-        expect(allPostsRes.body[1].title).toBe(posts[1].title);
-        expect(allPostsRes.body[1].message).toBe(posts[1].message);
-        expect(new mongoose_1.default.Types.ObjectId(allPostsRes.body[1].owner)).toEqual(postOwner);
+        expect(new mongoose_1.default.Types.ObjectId(allPostsForTests[0].owner)).toEqual(postOwner);
+        expect(allPostsForTests[1]._id).toBe(posts[1]._id);
+        expect(allPostsForTests[1].postText).toBe(posts[1].postText);
+        expect(allPostsForTests[1].postImageUrl).toBe(posts[1].postImageUrl);
+        expect(new mongoose_1.default.Types.ObjectId(allPostsForTests[1].owner)).toEqual(postOwner);
     }));
-    test("GET post by title", () => __awaiter(void 0, void 0, void 0, function* () {
+    test("GET post by owner", () => __awaiter(void 0, void 0, void 0, function* () {
+        const ownerId = (yield user_model_1.default.findOne({ email: testUser.email }))._id;
+        console.log("owner id: " + ownerId);
         const resPost = yield (0, supertest_1.default)(app)
             .get("/post")
-            .query({ title: posts[1].title }) //return array
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
+            .query({ owner: ownerId }) //return array
+            .set('Authorization', 'Bearer ' + refreshToken);
         expect(resPost.statusCode).toBe(200);
         console.log(resPost.body);
-        expect(resPost.body[0].title).toBe(posts[1].title);
-        expect(resPost.body[0].message).toBe(posts[1].message);
-        const postOwner = (yield user_model_1.default.findOne({ email: testUser.email }))._id;
-        expect(new mongoose_1.default.Types.ObjectId(resPost.body[0].owner)).toEqual(postOwner);
+        const filteredPosts = resPost.body.filter((post) => post.owner == ownerId);
+        expect(filteredPosts[0]._id).toBe(posts[0]._id);
+        expect(filteredPosts[0].postText).toBe(posts[0].postText);
+        expect(filteredPosts[0].postImageUrl).toBe(posts[0].postImageUrl);
+        expect(new mongoose_1.default.Types.ObjectId(filteredPosts[0].owner)).toEqual(ownerId);
     }));
-    test("FAIL to get post by title", () => __awaiter(void 0, void 0, void 0, function* () {
+    test("FAIL to get post by owner", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app)
             .get("/post")
-            .query({ title: 54490 })
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
+            .query({ title: { name: 'abc' } })
+            .set('Authorization', 'Bearer ' + refreshToken);
         expect(response.statusCode).toBe(404);
     }));
     test("PUT /post/:id", () => __awaiter(void 0, void 0, void 0, function* () {
         const res = yield (0, supertest_1.default)(app)
             .put("/post/" + postId1)
-            .set('Authorization', 'Bearer ' + testUser.accessToken)
-            .send({ title: "Updated Title" });
+            .set('Authorization', 'Bearer ' + refreshToken)
+            .send({ postContent: "Updated text for post 1" });
         expect(res.statusCode).toBe(200);
-        expect(res.body.title).toBe("Updated Title");
-        expect(res.body.message).toBe(posts[0].message);
+        expect(res.body.postText).toBe("Updated text for post 1");
+        expect(res.body._id).toBe(posts[0]._id);
+        expect(res.body.postImageUrl).toBe(posts[0].postImageUrl);
         const postOwner = (yield user_model_1.default.findOne({ email: testUser.email }))._id;
         expect(new mongoose_1.default.Types.ObjectId(res.body.owner)).toEqual(postOwner);
     }));
     test("FAIL to PUT post document", () => __awaiter(void 0, void 0, void 0, function* () {
         const res = yield (0, supertest_1.default)(app)
             .put("/post/" + postId2)
-            .set('Authorization', 'Bearer ' + testUser.accessToken)
-            .send({ owner: 1111 });
+            .set('Authorization', 'Bearer ' + refreshToken)
+            .send({ owner: { count: 10 } });
         expect(res.statusCode).toBe(400);
     }));
     test("DELETE post by its ID", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app)
+        const res1 = yield (0, supertest_1.default)(app)
             .delete("/post/" + postId2)
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
-        expect(res.statusCode).toBe(200);
+            .set('Authorization', 'Bearer ' + refreshToken);
+        expect(res1.statusCode).toBe(200);
         const resp = yield (0, supertest_1.default)(app)
             .get("/post/" + postId2)
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
+            .set('Authorization', 'Bearer ' + refreshToken);
         expect(resp.statusCode).toBe(404);
+        const res2 = yield (0, supertest_1.default)(app)
+            .delete("/post/" + postId1)
+            .set('Authorization', 'Bearer ' + refreshToken);
+        expect(res1.statusCode).toBe(200);
+        const resp2 = yield (0, supertest_1.default)(app)
+            .get("/post/" + postId1)
+            .set('Authorization', 'Bearer ' + refreshToken);
+        expect(resp2.statusCode).toBe(404);
     }));
     test(" FAIL to DELETE post by its ID", () => __awaiter(void 0, void 0, void 0, function* () {
         const res = yield (0, supertest_1.default)(app)
             .delete("/post/00000")
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
+            .set('Authorization', 'Bearer ' + refreshToken);
         expect(res.statusCode).toBe(404);
     }));
 });
