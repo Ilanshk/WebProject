@@ -25,7 +25,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const password = req.body.password;
     const imageUrl = req.body.userImageUrl;
     const age = req.body.userAge;
-    const state = req.body.userState;
+    const state = req.body.userCountry;
     if (email == null || password == null) {
         return res.status(400).send("Missing Email or Password");
     }

@@ -15,149 +15,66 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const supertest_1 = __importDefault(require("supertest"));
 const App_1 = __importDefault(require("../App"));
 const mongoose_1 = __importDefault(require("mongoose"));
-const student_model_1 = __importDefault(require("../models/student_model"));
 const user_model_1 = __importDefault(require("../models/user_model"));
 const testUser = {
-    email: "teststudent@gmail.com",
-    password: "123456",
-    accessToken: null
+    firstName: "testFirstStudent",
+    lastName: "testLastStudent",
+    email: "userTest@gmail.com",
+    password: "1234567",
+    userImageUrl: "http://192.168.56.1:3000/1715429550383",
+    userAge: "20",
+    userCountry: "Israel"
 };
+let refreshToken = '';
+let testUserId = '';
 let app;
 //is called before tests are performed in this file
 beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
     app = yield (0, App_1.default)();
     console.log("beforeAll");
-    yield student_model_1.default.deleteMany();
     yield user_model_1.default.deleteMany({ email: testUser.email });
-    yield (0, supertest_1.default)(app).post("/auth/register").send(testUser);
-    const res = yield (0, supertest_1.default)(app).post("/auth/login").send(testUser);
-    testUser.accessToken = res.body.accessToken;
+    yield (0, supertest_1.default)(app).post("/auth/register").send({ firstName: testUser.firstName, lastName: testUser.lastName, email: testUser.email, password: testUser.password, userImageUrl: testUser.userImageUrl, userAge: testUser.userAge, userCountry: testUser.userCountry });
+    const res = yield (0, supertest_1.default)(app).post("/auth/login").send({ email: testUser.email, password: testUser.password });
+    testUserId = res.body.userId;
+    refreshToken = res.body.refreshToken;
 }));
 afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
     console.log("afterAll");
     yield mongoose_1.default.connection.close();
 }));
-const students = [
-    {
-        name: "John Doe",
-        _id: "12345",
-        imageUrl: "",
-    },
-    {
-        name: "Jane Doe 2",
-        _id: "12346",
-        imageUrl: "",
-    },
-];
-describe("Student", () => {
-    test("Get /Student - empty collection", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).get("/student")
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
-        expect(res.statusCode).toBe(200);
-        const data = res.body;
-        expect(data).toEqual([]);
-    }));
-    test("POST /student 1 and GET this student", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).post("/student").send(students[0])
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
-        expect(res.statusCode).toEqual(201);
-        expect(res.body.name).toEqual(students[0].name);
-        expect(res.body.imageUrl).toEqual(students[0].imageUrl);
-        expect(res.body._id).toEqual(students[0]._id);
-        //studentId = res.body._id; //save the ID for later tests
-        const res2 = yield (0, supertest_1.default)(app).get("/student")
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
-        expect(res2.statusCode).toBe(200);
-        const data = res2.body;
-        expect(data[0].name).toBe(students[0].name);
-        expect(data[0]._id).toBe(students[0]._id);
-        expect(data[0].imageUrl).toBe(students[0].imageUrl);
-    }));
-    test("POST /student 2 and GET this student by id", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).post("/student").send(students[1])
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
-        expect(res.statusCode).toEqual(201);
-        expect(res.body.name).toEqual(students[1].name);
-        expect(res.body.imageUrl).toEqual(students[1].imageUrl);
-        expect(res.body._id).toEqual(students[1]._id);
-        //studentId = res.body._id; //save the ID for later tests
-        const res2 = yield (0, supertest_1.default)(app).get("/student/" + students[1]._id)
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
-        expect(res2.statusCode).toBe(200);
-        const data = res2.body;
-        expect(data.name).toBe(students[1].name);
-        expect(data._id).toBe(students[1]._id);
-        expect(data.imageUrl).toBe(students[1].imageUrl);
-    }));
-    test("GET /student/:id", () => __awaiter(void 0, void 0, void 0, function* () {
-        const resFirstStudent = yield (0, supertest_1.default)(app).get("/student/" + students[0]._id)
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
+describe("User", () => {
+    test("GET /user/:id", () => __awaiter(void 0, void 0, void 0, function* () {
+        const resFirstStudent = yield (0, supertest_1.default)(app).get("/user/" + testUserId)
+            .set('Authorization', 'Bearer ' + refreshToken);
         expect(resFirstStudent.statusCode).toBe(200);
-        expect(resFirstStudent.body.name).toBe(students[0].name);
-        expect(resFirstStudent.body._id).toBe(students[0]._id);
-        expect(resFirstStudent.body.imageUrl).toBe(students[0].imageUrl);
-        const resSecondStudent = yield (0, supertest_1.default)(app).get("/student/" + students[1]._id)
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
-        expect(resSecondStudent.statusCode).toBe(200);
-        expect(resSecondStudent.body.name).toBe(students[1].name);
-        expect(resSecondStudent.body._id).toBe(students[1]._id);
-        expect(resSecondStudent.body.imageUrl).toBe(students[1].imageUrl);
+        expect(resFirstStudent.body.firstName).toBe(testUser.firstName);
+        expect(resFirstStudent.body.lastName).toBe(testUser.lastName);
+        expect(resFirstStudent.body.email).toBe(testUser.email);
+        expect(resFirstStudent.body.userImageUrl).toBe(testUser.userImageUrl);
+        expect(resFirstStudent.body.userAge).toBe(testUser.userAge);
+        expect(resFirstStudent.body.userCountry).toBe(testUser.userCountry);
     }));
-    test("Fail GET /student/:id", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).get("/student/00000")
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
+    test("Fail GET /user/:id", () => __awaiter(void 0, void 0, void 0, function* () {
+        const res = yield (0, supertest_1.default)(app).get("/user/00000")
+            .set('Authorization', 'Bearer ' + refreshToken);
         expect(res.statusCode).toBe(404);
     }));
-    test("GET all students ", () => __awaiter(void 0, void 0, void 0, function* () {
-        const allStudentsRes = yield (0, supertest_1.default)(app).get("/student")
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
-        expect(allStudentsRes.statusCode).toBe(200);
-        expect(allStudentsRes.body[0].name).toBe(students[0].name);
-        expect(allStudentsRes.body[0].imageUrl).toBe(students[0].imageUrl);
-        expect(allStudentsRes.body[0]._id).toBe(students[0]._id);
-        expect(allStudentsRes.body[1].name).toBe(students[1].name);
-        expect(allStudentsRes.body[1].imageUrl).toBe(students[1].imageUrl);
-        expect(allStudentsRes.body[1]._id).toBe(students[1]._id);
-    }));
-    test("GET student by name", () => __awaiter(void 0, void 0, void 0, function* () {
-        const resStudent = yield (0, supertest_1.default)(app).get("/student").query({ name: "Jane Doe 2" })
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
-        expect(resStudent.statusCode).toBe(200);
-        expect(resStudent.body[0].name).toBe(students[1].name);
-        expect(resStudent.body[0].imageUrl).toBe(students[1].imageUrl);
-        expect(resStudent.body[0]._id).toBe(students[1]._id);
-    }));
-    test("FAIL to get student by name", () => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield (0, supertest_1.default)(app).get("/student").query({ name: "abc" })
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
-        expect(response.statusCode).toBe(404);
-    }));
-    test("PUT /student/:id", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).put("/student/" + students[1]._id).send({ imageUrl: "url" })
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
-        console.log("Tets PUT /student/:id" + res.body);
+    test("PUT /user/:id", () => __awaiter(void 0, void 0, void 0, function* () {
+        const res = yield (0, supertest_1.default)(app).put("/user/" + testUserId).send({ userImageUrl: "url" })
+            .set('Authorization', 'Bearer ' + refreshToken);
+        const userImageUrl = (yield user_model_1.default.findOne({ email: testUser.email })).userImageUrl;
         expect(res.statusCode).toBe(200);
-        expect(res.body._id).toBe(students[1]._id);
-        expect(res.body.name).toBe(students[1].name);
-        expect(res.body.imageUrl).toBe("url");
+        expect(res.body.firstName).toBe(testUser.firstName);
+        expect(res.body.lastName).toBe(testUser.lastName);
+        expect(res.body.email).toBe(testUser.email);
+        expect(res.body.userImageUrl).toBe(userImageUrl);
+        expect(res.body.userAge).toBe(testUser.userAge);
+        expect(res.body.userCountry).toBe(testUser.userCountry);
     }));
-    test("FAIL to PUT student document", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).put("/student/" + students[1]._id).send({ imageUrl: { id: 80 } })
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
+    test("FAIL to PUT user document", () => __awaiter(void 0, void 0, void 0, function* () {
+        const res = yield (0, supertest_1.default)(app).put("/user/" + testUserId).send({ userImageUrl: { id: 80 } })
+            .set('Authorization', 'Bearer ' + refreshToken);
         expect(res.statusCode).toBe(400);
-    }));
-    test("DELETE student by its ID", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).delete("/student/" + students[0]._id)
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
-        expect(res.statusCode).toBe(200);
-        const resp = yield (0, supertest_1.default)(app).get("/student/" + students[0]._id)
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
-        expect(resp.statusCode).toBe(404);
-    }));
-    test(" FAIL to DELETE student by its ID", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).delete("/student/788900")
-            .set('Authorization', 'Bearer ' + testUser.accessToken);
-        expect(res.statusCode).toBe(404);
     }));
 });
 //# sourceMappingURL=student.test.js.map

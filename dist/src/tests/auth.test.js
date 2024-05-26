@@ -17,8 +17,13 @@ const App_1 = __importDefault(require("../App"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const user_model_1 = __importDefault(require("../models/user_model"));
 const user = {
-    email: "test@gmail.com",
-    password: "123456"
+    firstName: "userAuthFirst",
+    lastName: "userAuthLast",
+    email: "testAuth@gmail.com",
+    password: "123456",
+    userImageUrl: "http://http://192.168.56.1:3000/1715429550383",
+    userAge: "20",
+    userCountry: "Israel"
 };
 let app;
 let accessToken = "";
@@ -35,18 +40,18 @@ afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
 }));
 describe("Auth test", () => {
     test("Post /register", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).post("/auth/register").send(user);
+        const res = yield (0, supertest_1.default)(app).post("/auth/register").send({ firstName: user.firstName, lastName: user.lastName, email: user.email, password: user.password, userImageUrl: user.userImageUrl, userAge: user.userAge, userCountry: user.userCountry });
         expect(res.statusCode).toBe(200);
     }));
     test("Post /login", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).post("/auth/login").send(user);
+        const res = yield (0, supertest_1.default)(app).post("/auth/login").send({ email: user.email, password: user.password });
         expect(res.statusCode).toBe(200);
         accessToken = res.body.accessToken;
         refreshToken = res.body.refreshToken;
         expect(accessToken).not.toBeNull();
         expect(refreshToken).not.toBeNull();
         //Here we add the authorization field to the request
-        const res2 = yield (0, supertest_1.default)(app).get("/student/").set('Authorization', 'Bearer ' + accessToken);
+        const res2 = yield (0, supertest_1.default)(app).get("/post/").set('Authorization', 'Bearer ' + refreshToken);
         expect(res2.statusCode).toBe(200);
         const fakeToken = accessToken + "0";
         const res3 = yield (0, supertest_1.default)(app).get("/student/").set('Authorization', 'Bearer ' + fakeToken);
@@ -59,7 +64,7 @@ describe("Auth test", () => {
     };
     jest.setTimeout(100000);
     test("refresh token", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield (0, supertest_1.default)(app).post("/auth/login").send(user);
+        const res = yield (0, supertest_1.default)(app).post("/auth/login").send({ email: user.email, password: user.password });
         expect(res.statusCode).toBe(200);
         //const accessToken = res.body.accessToken
         refreshToken = res.body.refreshToken;
@@ -71,19 +76,19 @@ describe("Auth test", () => {
         accessToken = res2.body.accessToken;
         expect(refreshToken).not.toBeNull();
         expect(accessToken).not.toBeNull();
-        const res3 = yield (0, supertest_1.default)(app).get("/student")
-            .set('Authorization', 'Bearer ' + accessToken);
+        const res3 = yield (0, supertest_1.default)(app).get("/post")
+            .set('Authorization', 'Bearer ' + refreshToken);
         expect(res3.statusCode).toBe(200);
         //check token expiration - sleep 6 seconds and check if access token is expired
         yield timeout(6000);
-        const res4 = yield (0, supertest_1.default)(app).get("/student")
+        const res4 = yield (0, supertest_1.default)(app).get("/post")
             .set('Authorization', 'Bearer ' + accessToken);
         expect(res4.statusCode).not.toBe(200);
     }));
     test("refresh token after expiration", () => __awaiter(void 0, void 0, void 0, function* () {
         //check token expiration - sleep 6 seconds and check if access token is expired
         yield timeout(6000);
-        const res = yield (0, supertest_1.default)(app).get("/student")
+        const res = yield (0, supertest_1.default)(app).get("/post")
             .set('Authorization', 'Bearer ' + accessToken);
         expect(res.statusCode).not.toBe(200);
         const res1 = yield (0, supertest_1.default)(app).get("/auth/refresh")
@@ -94,8 +99,8 @@ describe("Auth test", () => {
         accessToken = res1.body.accessToken;
         expect(refreshToken).not.toBeNull();
         expect(accessToken).not.toBeNull();
-        const res2 = yield (0, supertest_1.default)(app).get("/student")
-            .set('Authorization', 'Bearer ' + accessToken);
+        const res2 = yield (0, supertest_1.default)(app).get("/post")
+            .set('Authorization', 'Bearer ' + refreshToken);
         expect(res2.statusCode).toBe(200);
     }));
     test("refresh token violation", () => __awaiter(void 0, void 0, void 0, function* () {
