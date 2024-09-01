@@ -3,7 +3,7 @@ import swaggerUI from "swagger-ui-express";
 import swaggerJsDoc from "swagger-jsdoc";
 
 
-appInit().then((app)=>{
+appInit.initApp().then((app)=>{
     if(process.env.NODE_ENV == "development"){
         const options = {
             definition:{
@@ -25,10 +25,7 @@ appInit().then((app)=>{
         };
         const specs = swaggerJsDoc(options);
         app.use("/api-docs",swaggerUI.serve,swaggerUI.setup(specs));
+        
 
     }
-    
-    app.listen(process.env.PORT,()=>{
-        console.log(`Example app listening on port ${process.env.PORT}!`);
-    });
 })

@@ -30,7 +30,7 @@ const testUser = {
 let refreshToken = '';
 //is called before tests are performed in this file
 beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
-    app = yield (0, App_1.default)();
+    app = yield App_1.default.initApp();
     console.log("beforeAll");
     yield post_model_1.default.deleteMany({ _id: 1456227 });
     yield user_model_1.default.deleteMany({ email: testUser.email });
@@ -41,6 +41,7 @@ beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
 afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
     console.log("afterAll");
     yield mongoose_1.default.connection.close();
+    App_1.default.server.close();
 }));
 const posts = [
     {

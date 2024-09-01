@@ -30,7 +30,7 @@ let testUserId = '';
 let app;
 //is called before tests are performed in this file
 beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
-    app = yield (0, App_1.default)();
+    app = yield App_1.default.initApp();
     console.log("beforeAll");
     yield user_model_1.default.deleteMany({ email: testUser.email });
     yield (0, supertest_1.default)(app).post("/auth/register").send({ firstName: testUser.firstName, lastName: testUser.lastName, email: testUser.email, password: testUser.password, userImageUrl: testUser.userImageUrl, userAge: testUser.userAge, userCountry: testUser.userCountry });
@@ -40,6 +40,7 @@ beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
 }));
 afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
     console.log("afterAll");
+    App_1.default.server.close();
     yield mongoose_1.default.connection.close();
 }));
 describe("User", () => {

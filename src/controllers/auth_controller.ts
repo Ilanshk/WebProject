@@ -2,9 +2,7 @@ import {NextFunction, Request,Response} from "express"
 import User from "../models/user_model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import {OAuth2Client} from 'google-auth-library';
 
-const client = new OAuth2Client();
 
 
 const register = async (req:Request,res:Response) =>{
@@ -131,44 +129,6 @@ const login = async (req:Request,res:Response) =>{
     
 }
 
-const signInWithGoogle = async(req:Request,res:Response) =>{
-    try{
-        const Loginticket = await client.verifyIdToken({
-        idToken: req.body.token,
-        audience: process.env.CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
-    });
-    const payload = Loginticket.getPayload();
-    const email = payload?.email;
-    if(email != null){
-        let user = await User.findOne({email:email})
-        if(user == null){
-            //user not found, create new user
-            user = await User.create(
-                {
-                    email:email,
-                    password:'',
-                    imageUrl:payload?.picture,
-                    //what about tokens?
-                }
-            )
-        }
-        const tokens = generateTokens(user._id.toString());
-        console.log("tokens were generated");
-        
-        return res.status(200).send(
-            {
-                email:user.email,
-                userImageUrl:user.userImageUrl,
-                userTokens: tokens
-            });
-    }
-    }catch(error){
-        return res.status(400).send(error.message)
-
-
-    }
-}
-
 
 const logout = async(req:Request,res:Response) =>{
     const authHeader = req.headers['authorization'];
@@ -248,4 +208,4 @@ const refresh = async(req:Request,res:Response) =>{
     }); 
     
 }
-export default {register,login,logout,refresh,signInWithGoogle}
+export default {register,login,logout,refresh}

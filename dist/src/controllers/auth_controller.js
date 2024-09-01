@@ -15,8 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const user_model_1 = __importDefault(require("../models/user_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const google_auth_library_1 = require("google-auth-library");
-const client = new google_auth_library_1.OAuth2Client();
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(req.body);
     const firstName = req.body.firstName;
@@ -122,38 +120,6 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(400).send(error.message);
     }
 });
-const signInWithGoogle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const Loginticket = yield client.verifyIdToken({
-            idToken: req.body.token,
-            audience: process.env.CLIENT_ID, // Specify the CLIENT_ID of the app that accesses the backend
-        });
-        const payload = Loginticket.getPayload();
-        const email = payload === null || payload === void 0 ? void 0 : payload.email;
-        if (email != null) {
-            let user = yield user_model_1.default.findOne({ email: email });
-            if (user == null) {
-                //user not found, create new user
-                user = yield user_model_1.default.create({
-                    email: email,
-                    password: '',
-                    imageUrl: payload === null || payload === void 0 ? void 0 : payload.picture,
-                    //what about tokens?
-                });
-            }
-            const tokens = generateTokens(user._id.toString());
-            console.log("tokens were generated");
-            return res.status(200).send({
-                email: user.email,
-                userImageUrl: user.userImageUrl,
-                userTokens: tokens
-            });
-        }
-    }
-    catch (error) {
-        return res.status(400).send(error.message);
-    }
-});
 const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -225,5 +191,5 @@ const refresh = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }));
 });
-exports.default = { register, login, logout, refresh, signInWithGoogle };
+exports.default = { register, login, logout, refresh };
 //# sourceMappingURL=auth_controller.js.map

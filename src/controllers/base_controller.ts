@@ -9,11 +9,8 @@ class BaseController<ModelType>{
   }
 
   async get(req:Request, res:Response){
-    console.log("get");
     try{
       if(req.query.name != null){
-        console.log("name");
-        
         const item = await this.itemModel.find({name:req.query.name});
         if(item.length == 0){
           return res.status(404).send("Student Not Found");
@@ -23,7 +20,6 @@ class BaseController<ModelType>{
         }
       }
       if(req.query.title != null){
-        console.log("title");
         const item = await this.itemModel.find({title:req.query.title});
         if(item.length == 0){
           return res.status(404).send("Not Found");
@@ -43,9 +39,6 @@ class BaseController<ModelType>{
         }
       }
       if(req.query.owner != null){
-        console.log("owner");
-        console.log(req.query);
-        
         const item = await this.itemModel.find({owner:req.query.owner});
         if(item.length == 0){
           return res.status(404).send("Not Found");
@@ -93,9 +86,6 @@ class BaseController<ModelType>{
   }
   
   async post(req:Request, res:Response){
-    console.log("post");
-    console.log(req.body);
-    
     try{
       const item = await this.itemModel.create(req.body);
       res.status(201).send(item);
@@ -175,20 +165,6 @@ class BaseController<ModelType>{
   };
   
   
-
-  async remove(req:Request, res:Response){
-    try{
-      const result = await this.itemModel.deleteOne({_id:req.params.id});
-      if(result.deletedCount == 1)
-        return res.status(200).send("Delete Was Done");
-      else
-        return res.status(404).send("Failed to delete");
-    }catch(error){
-      console.log(error)
-      res.status(404).send(error.message)
-    }
-  
-  }
 };
   
   export default BaseController;

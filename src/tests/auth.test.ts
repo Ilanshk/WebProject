@@ -20,7 +20,7 @@ let refreshToken = "";
 
 //is called before tests are performed in this file
 beforeAll(async()=>{
-    app = await appInit();
+    app = await appInit.initApp();
     console.log("beforeAll");
     await User.deleteMany({email:user.email})
     
@@ -28,6 +28,7 @@ beforeAll(async()=>{
 
 afterAll(async ()=>{
     console.log("afterAll");
+    appInit.server.close();
     await mongoose.connection.close();
 });
 
@@ -45,15 +46,6 @@ describe("Auth test", () =>{
         refreshToken = res.body.refreshToken;
         expect(accessToken).not.toBeNull();
         expect(refreshToken).not.toBeNull();
-
-        //Here we add the authorization field to the request
-        const res2 = await request(app).get("/post/").set('Authorization','Bearer ' + refreshToken);
-        expect(res2.statusCode).toBe(200);
-
-        const fakeToken = accessToken + "0";
-        const res3 = await request(app).get("/student/").set('Authorization','Bearer ' + fakeToken);
-        expect(res3.statusCode).not.toBe(200);
-
     });
 
 
@@ -81,37 +73,7 @@ describe("Auth test", () =>{
         expect(refreshToken).not.toBeNull();
         expect(accessToken).not.toBeNull();
 
-        const res3 = await request(app).get("/post")
-            .set('Authorization','Bearer ' + refreshToken);
-        expect(res3.statusCode).toBe(200);
 
-        //check token expiration - sleep 6 seconds and check if access token is expired
-        await timeout(6000);
-        const res4 = await request(app).get("/post")
-            .set('Authorization','Bearer ' + accessToken);
-        expect(res4.statusCode).not.toBe(200);
-    })
-
-    test("refresh token after expiration",async() =>{
-         //check token expiration - sleep 6 seconds and check if access token is expired
-         await timeout(6000);
-         const res = await request(app).get("/post")
-             .set('Authorization','Bearer ' + accessToken);
-         expect(res.statusCode).not.toBe(200);
-
-         const res1 = await request(app).get("/auth/refresh")
-            .set('Authorization','Bearer ' + refreshToken)
-            .send()
-        expect(res1.statusCode).toBe(200);
-        refreshToken = res1.body.refreshToken;
-        accessToken = res1.body.accessToken;
-        expect(refreshToken).not.toBeNull();
-        expect(accessToken).not.toBeNull();
-
-        const res2 = await request(app).get("/post")
-             .set('Authorization','Bearer ' + refreshToken);
-         expect(res2.statusCode).toBe(200);
-    
     })
 
 

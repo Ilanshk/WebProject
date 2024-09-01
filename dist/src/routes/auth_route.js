@@ -98,7 +98,6 @@ router.post("/login", auth_controller_1.default.login);
 *               $ref: '#/components/schemas/User'
 */
 router.post("/register", auth_controller_1.default.register);
-router.post("/google", auth_controller_1.default.signInWithGoogle);
 /**
 * @swagger
 * /auth/logout:
